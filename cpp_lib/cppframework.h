@@ -1,0 +1,31 @@
+/**
+ * @defgroup cppframework C++ Utilities
+ * 
+ * 
+ * 
+ * 
+ */
+#ifndef __CPP_FRAMEWORK_H__
+#define __CPP_FRAMEWORK_H__
+
+#define CPP_AUDIO_ENABLED       1
+#define CPP_CODEC_G729_ENABLED  0
+
+
+
+#if defined(__linux__)
+    #define CPP_AUDIO_LIB_PULSE 1
+    #define COMMUNICATION_SOCKET_ETHERNET_ENABLED   1
+    #define COMMUNICATION_SOCKET_SSL_ENABLED        1
+    #define COMMUNICATION_SOCKET_ETHERNET_LIB_PCAP	0
+    #define COMMUNICATION_SOCKET_ETHERNET_LIB       COMMUNICATION_SOCKET_ETHERNET_LIB_PCAP
+#elif defined(_MSC_VER)
+    #define COMMUNICATION_SOCKET_ETHERNET_ENABLED   0
+    #define COMMUNICATION_SOCKET_SSL_ENABLED        1
+    #define COMMUNICATION_SOCKET_ETHERNET_LIB_PCAP	0
+    #define COMMUNICATION_SOCKET_ETHERNET_LIB       1   //COMMUNICATION_SOCKET_ETHERNET_LIB_PCAP
+#endif
+
+#endif
+
+// end of file
