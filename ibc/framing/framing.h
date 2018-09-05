@@ -162,8 +162,8 @@ public:
     void set_protocol(bool set) {protocol_ = set;}
     bool get_protocol() const {return protocol_;}
 
-    auto get_buf_size() const {return frames_buf_.size();}
-    auto get_sent_size() const {return frames_sent_.size();}
+    size_t get_buf_size() const {return frames_buf_.size();}
+    size_t get_sent_size() const {return frames_sent_.size();}
 
 private:
     uint8_t seq_local_;

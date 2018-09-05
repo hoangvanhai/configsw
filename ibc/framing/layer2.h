@@ -72,8 +72,8 @@ public:
     bool is_start() const {return start_;}
 
 private:
-    auto get_buf_size() const { return frame_->get_buf_size();}
-    auto get_sent_size() const { return frame_->get_sent_size();}
+    size_t get_buf_size() const { return frame_->get_buf_size();}
+    size_t get_sent_size() const { return frame_->get_sent_size();}
 
     void set_nack(bool set) { frame_->set_nack(set);}
 

@@ -26,7 +26,7 @@ typedef int     (*getopt_long_dll)(int argc, char * const argv[], const char *op
 typedef int     (*open_dll)(const char *pathname, int flags, mode_t mode);
 typedef int     (*close_dll)(int fd);
 typedef ssize_t (*read_dll)(int fd, void *buf, size_t count);
-#elif defined(_MSC_VER)
+#elif (defined(_MSC_VER) || defined(__GNUC__))
 #include <Windows.h>
 #endif
 
@@ -50,7 +50,7 @@ T dll_function(std::string func){
     static std::string szDllNames[] = {
 #if defined(__linux__)
         "libc.so.6",
-#elif defined(_MSC_VER)
+#elif (defined(_MSC_VER) || defined(__GNUC__))
         "msvcrt.dll",
 #endif
         "null"
@@ -65,7 +65,7 @@ T dll_function(std::string func){
         ~DllHandle(){
 #if defined(__linux__)
             dlclose(m_handle);
-#elif defined(_MSC_VER)
+#elif (defined(_MSC_VER) || defined(__GNUC__))
             FreeLibrary(m_handle);
 #endif
             m_handle = 0;
@@ -76,7 +76,7 @@ T dll_function(std::string func){
         int  openDll(){
 #if defined(__linux__)
             m_handle = dlopen((const char*)m_dllName.c_str(), RTLD_LAZY);
-#elif defined(_MSC_VER)
+#elif (defined(_MSC_VER) || defined(__GNUC__))
             //wchar_t tmpb[512];
             //MultiByteToWideChar(CP_ACP, 0, m_dllName.c_str(), -1, tmpb, 512);
 //             m_handle = LoadLibrary(m_dllName.c_str());
@@ -92,7 +92,7 @@ T dll_function(std::string func){
             if(m_handle){
 #if defined(__linux__)
                 T fxn = (T)dlsym(m_handle, functionName.c_str());
-#elif defined(_MSC_VER)
+#elif (defined(_MSC_VER) || defined(__GNUC__))
                 T fxn = (T)GetProcAddress(m_handle, functionName.c_str());
 #endif
                 return fxn;
@@ -103,7 +103,7 @@ T dll_function(std::string func){
     private:
 #if defined(__linux__)
         void* m_handle;
-#elif defined(_MSC_VER)
+#elif (defined(_MSC_VER) || defined(__GNUC__))
         HINSTANCE m_handle;
 #endif
         std::string m_dllName;

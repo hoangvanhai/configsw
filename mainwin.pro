@@ -26,6 +26,8 @@ INCLUDEPATH +=  $$PWD \
 win32 {
     DEFINES += WIN32_LEAN_AND_MEAN  # exclude some APIs Cryptography, DDE, RPC, Shell ...
     DEFINES -= UNICODE              # used for serial port opening with WINAPI
+    CONFIG += c++11
+    LIBS += -lws2_32
 }
 
 unix {

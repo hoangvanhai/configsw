@@ -38,7 +38,7 @@ namespace communication{
     enum Constant{
 #ifdef __linux__
         SOCKET_INVALID = -1,    ///< Invalid socket ID
-#elif defined(_MSC_VER)
+#elif (defined(_MSC_VER) || defined(__GNUC__))
 		SOCKET_INVALID = (~0),
 #endif
     };

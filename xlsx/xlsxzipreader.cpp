@@ -50,7 +50,7 @@ ZipReader::~ZipReader()
 
 void ZipReader::init()
 {
-#if defined(_MSC_VER)
+#if (defined(_MSC_VER) || defined(__GNUC__))
     QList<QZipReader::FileInfo> allFiles = m_reader->fileInfoList().toList();
 #elif defined(__linux__)
     QVector<QZipReader::FileInfo> allFiles = m_reader->fileInfoList();

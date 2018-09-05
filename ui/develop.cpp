@@ -725,7 +725,10 @@ void DebugDock::recvUpdateDebug(uint8_t *data, int len)
     QString str((const char*)data);
     //std::cout << str.toStdString(); fflush(stdout);
     editScreen->insertPlainText(str);
+
     editScreen->verticalScrollBar()->setValue(editScreen->verticalScrollBar()->maximum());
+
+
 }
 
 DebugDock::DebugDock(const QString &name, QWidget *parent) :

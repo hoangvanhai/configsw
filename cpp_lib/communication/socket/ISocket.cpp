@@ -11,7 +11,7 @@ using namespace communication;
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <poll.h>
-#elif defined(_MSC_VER)
+#elif (defined(_MSC_VER) || defined(__GNUC__))
 #include <WinSock2.h>
 #include <ws2tcpip.h>
 #include <windows.h>
@@ -44,7 +44,7 @@ ISocket::~ISocket(){
     if(m_sockID != SOCKET_INVALID){
 #if defined(__linux__)
         close(m_sockID);
-#elif defined(_MSC_VER)
+#elif (defined(_MSC_VER) || defined(__GNUC__))
 		closesocket(m_sockID);
 #endif
         m_sockID = SOCKET_INVALID;
@@ -116,7 +116,7 @@ int ISocket::setBlockingMode(){
         if(val >= 0)
             err = 0;
     }
-#elif defined(_MSC_VER)
+#elif (defined(_MSC_VER) || defined(__GNUC__))
 	unsigned long mode = 0;
 	ioctlsocket(m_sockID, FIONBIO, &mode);
 	err = 0;
@@ -134,7 +134,7 @@ int ISocket::setNonBlockingMode(){
         if(val >= 0)
             err = 0;
     }
-#elif defined(_MSC_VER)
+#elif (defined(_MSC_VER) || defined(__GNUC__))
 	unsigned long mode = 1;
 	ioctlsocket(m_sockID, FIONBIO, &mode);
 	err = 0;

@@ -76,7 +76,7 @@ namespace communication{
                 virtual int setAttribute(int attrId, void* attr, int attrSize);
                 virtual int getAttribute(int attrId, void* attr, int attrSize);
 
-#if defined(_MSC_VER)
+#if (defined(_MSC_VER) || defined(__GNUC__))
 				virtual int waitEvent(int eventMustToWait, int timeoutInMilisecond);
 #endif
                 

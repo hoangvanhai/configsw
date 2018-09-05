@@ -1,6 +1,6 @@
 #include "SerialSocket.h"
 
-#if defined(_MSC_VER)
+#if (defined(_MSC_VER) || defined(__GNUC__))
 #include <Windows.h>
 #include "../../../string/StringUtils.h"
 #include "../../../safe/Safe.h"
@@ -367,6 +367,7 @@ int SerialSocket::setPortName(struct AttributePortName *port){
 	}
     return err;
 }
+
 int SerialSocket::closeDevice(){
     int err = -1;
     if (m_handle) {

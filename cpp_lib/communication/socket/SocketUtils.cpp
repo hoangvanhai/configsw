@@ -2,7 +2,7 @@
 #if defined(__linux__)
 #include <sys/types.h>
 #include <sys/socket.h>
-#elif defined(_MSC_VER)
+#elif (defined(_MSC_VER) || defined(__GNUC__))
 #include <WinSock2.h>
 #include <ws2tcpip.h>
 #include <windows.h>
