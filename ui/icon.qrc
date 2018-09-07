@@ -47,5 +47,6 @@
         <file>icon/wifi.png</file>
         <file>icon/wireless-connectivity.png</file>
         <file>icon/world.png</file>
+        <file>icon/battery.png</file>
     </qresource>
 </RCC>

@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui serialport gui-private
+QT       += core charts gui serialport gui-private
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -28,6 +28,7 @@ win32 {
     DEFINES -= UNICODE              # used for serial port opening with WINAPI
     CONFIG += c++11
     LIBS += -lws2_32
+    CONFIG += static
 }
 
 unix {
@@ -40,10 +41,8 @@ DEFINES += XLSX_NO_LIB
 SOURCES += main.cpp\
     ui/mainwindow.cpp \
     ui/develop.cpp \
-    ui/program.cpp \
     ui/setting.cpp \
     ui/slidingstackedwidget.cpp \
-    ui/tool.cpp \
     ibc/framing/background.cpp \
     ibc/framing/framing.cpp \
     ibc/framing/layer2.cpp \
@@ -96,10 +95,8 @@ SOURCES += main.cpp\
 HEADERS  += ui/mainwindow.h \
     ui/develop.h \
     ui/mainwindow.h \
-    ui/program.h \
     ui/setting.h \
     ui/slidingstackedwidget.h \
-    ui/tool.h \
     ibc/framing/background.h \
     ibc/framing/framing.h \
     ibc/framing/layer2.h \

@@ -2,12 +2,14 @@
 #define DEVELOP_H
 
 #include <QtWidgets>
+#include <QtCharts>
 #include <xlsx/xlsxdocument.h>
 #include <layer2.h>
 #include <config/config.h>
 
+
 class StreamDock;
-class DebugDock;
+class ChartDock;
 
 class Develop : public QMainWindow
 {
@@ -28,47 +30,41 @@ signals:
     void signalStreamEvent(int event);
     void signalStreamData(uint8_t *data_,
                          int data_len_);
-    void signalDebugEvent(int event);
-    void signalDebugData(uint8_t *data,
+    void signalChartEvent(int event);
+    void signalChartData(uint8_t *data,
                          int data_len);
 private slots:
-    void openDebug();
-    void closeDebug();
-    void openStream();
-    void closeStream();
-    void showDebug();
-    void showStream();
-    void clearMessage();
+    void openChart();
+    void closeChart();    
+    void showChart();
     void saveMessage();
-    void sendDebugData(QString);
-    void recvStreamDataEvent(uint8_t *data_,
+    void sendChartData(QString);
+    void recvChartDataEvent(uint8_t *data_,
                        int data_len_);
 
-    void recvStreamEvent(int event);
-    void recvDebugDataEvent(uint8_t *data_,
-                       int data_len_);
-
-    void recvDebugEvent(int event);
+    void recvChartEvent(int event);
 
 private:
 
     QToolBar *toolBar;
-    QHBoxLayout *mainLayout;
+    QVBoxLayout *mainLayout;
     QWidget *centerWidget;
 
-    QTableView *tableView;
-    QStandardItemModel *model;
+    QToolButton *btnOpenChart, *btnCloseChart, *btnShowChart;
 
+    ChartDock *chart;
 
-    QToolButton *btnOpenDebug, *btnCloseDebug, *btnShowDebug,
-    *btnOpenStream, *btnCloseStream, *btnShowStream, *btnClearStream,
-    *btnSaveStream;
+    QDoubleSpinBox  *spinFloatVolt, *spinBoostVolt, *spinBoostCurrent,
+                    *spinBoostTime, *spinBoardID;
 
-    DebugDock *debug;
-    StreamDock *stream;
+    QPushButton *btnFloatVolt, *btnBoostVolt, *btnBoostCurr,
+                *btnBoostTime, *btnBoardID, *btnVusb, *btnSetAll;
 
-    std::shared_ptr<ibc::layer2> ibc_stream_;
-    std::shared_ptr<ibc::layer2> ibc_debug_;
+    QCheckBox   *checkVusb;
+
+    QPlainTextEdit  *editStatus;
+
+    std::shared_ptr<ibc::layer2> ibc_chart_;
 
     QXlsx::Document *msgFile;
     uint32_t        current_row;
@@ -76,64 +72,27 @@ private:
 
 
 
-class DebugDock : public QDockWidget {
+class ChartDock : public QDockWidget {
     Q_OBJECT
+public:
+    explicit ChartDock(const QString &name, QWidget *parent = 0);
 
-    QCheckBox *checkProDebug;
-    QToolButton *btnClear, *btnSave;
-    QPlainTextEdit *peditScreen;
-    QTextEdit   *editScreen;
+    void createElement();
+    void createConnection();
 
-    std::shared_ptr<ibc::layer2> ibc_debug_;
+private:
+    QCheckBox       *checkProChart;
+    QToolButton     *btnClear, *btnSave;        
+
+    std::shared_ptr<ibc::layer2> ibc_chart_;
 
 private slots:
-    void clearDebugScreen();
-    void saveDebugScreen();
+    void clearChartScreen();
+    void saveChartScreen();
 
 public slots:
-    void recvUpdateDebug(uint8_t *data, int len);
-public:
-    explicit DebugDock(const QString &name, QWidget *parent = 0);
+    void recvUpdateChart(uint8_t *data, int len);
 
-    void createElement();
-    void createConnection();
-};
-
-
-class StreamDock : public QDockWidget {
-    Q_OBJECT
-
-    QComboBox *comSrc, *comDst;
-    QLineEdit *editCtrl, *editData;
-    QCheckBox *checkRepeat;
-    QSpinBox *spinDelay;
-
-    QPushButton *btnSend;
-    QTimer      *timer;
-
-    std::shared_ptr<ibc::layer2> ibc_stream_;
-
-private slots:
-    void updateEditData();
-    void onSendRepeat();
-    void onSendOneTime();
-    void sendData();
-    void updateDelay();
-
-
-public:
-    explicit StreamDock(const QString &name, QWidget *parent = 0);
-    ~StreamDock() {
-        timer->stop();
-    }
-
-    void createElement();
-    void setPanelEnable(bool en);
-    void createConnection();
-
-    void set_ibc_object(const std::shared_ptr<ibc::layer2> &ibc) {
-        ibc_stream_ = ibc;
-    }
 };
 
 

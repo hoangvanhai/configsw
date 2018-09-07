@@ -5,9 +5,7 @@
 #include <QApplication>
 #include <QtWidgets>
 #include <develop.h>
-#include <program.h>
 #include <setting.h>
-#include <tool.h>
 
 
 class MainWindow : public QMainWindow
@@ -26,7 +24,7 @@ public:
     void createTitleButton();
 
 public slots:
-    void close() {qApp->quit();}
+    //void close() {qApp->quit();}
 private:
     QTabWidget *tabWidget;
     QWidget *centerWidget;
@@ -34,9 +32,31 @@ private:
 
 
     Setting     *setting;
-    Develop     *develop;
-    Program     *program;
-    Tool        *tool;
+    Develop     *develop;    
+
+    QPushButton *min, *max, *close;
+
+    // frameless windows implement
+signals:
+    void minimize();
+    void maximize();
+    void quit();
+
+private slots:
+    void closeWindow() {QApplication::quit(); }
+    void minimizeWindow() {setWindowState(Qt::WindowMinimized);}
+    void maximizeWindow();
+
+private:
+
+    bool isMouseDown = false;
+    int mouseOffsetX = 0, mouseOffsetY = 0;
+protected:
+    void mouseMoveEvent(QMouseEvent *event);
+    void mousePressEvent(QMouseEvent *event);
+    void mouseReleaseEvent(QMouseEvent *event);
+
+    QPoint mousePoint;
 };
 
 #endif // MAINWINDOW_H
