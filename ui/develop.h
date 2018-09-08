@@ -9,7 +9,7 @@
 
 
 class StreamDock;
-class ChartDock;
+class ControlDock;
 
 class Develop : public QMainWindow
 {
@@ -37,7 +37,6 @@ private slots:
     void openChart();
     void closeChart();    
     void showChart();
-    void saveMessage();
     void sendChartData(QString);
     void recvChartDataEvent(uint8_t *data_,
                        int data_len_);
@@ -52,17 +51,9 @@ private:
 
     QToolButton *btnOpenChart, *btnCloseChart, *btnShowChart;
 
-    ChartDock *chart;
+    ControlDock *control;
 
-    QDoubleSpinBox  *spinFloatVolt, *spinBoostVolt, *spinBoostCurrent,
-                    *spinBoostTime, *spinBoardID;
-
-    QPushButton *btnFloatVolt, *btnBoostVolt, *btnBoostCurr,
-                *btnBoostTime, *btnBoardID, *btnVusb, *btnSetAll;
-
-    QCheckBox   *checkVusb;
-
-    QPlainTextEdit  *editStatus;
+    QToolButton     *btnClear, *btnSave;
 
     std::shared_ptr<ibc::layer2> ibc_chart_;
 
@@ -72,19 +63,34 @@ private:
 
 
 
-class ChartDock : public QDockWidget {
+class ControlDock : public QDockWidget {
     Q_OBJECT
 public:
-    explicit ChartDock(const QString &name, QWidget *parent = 0);
+    explicit ControlDock(const QString &name, QWidget *parent = 0);
 
     void createElement();
+    void createLayout();
     void createConnection();
 
-private:
-    QCheckBox       *checkProChart;
-    QToolButton     *btnClear, *btnSave;        
+private:     
+    QDoubleSpinBox  *spinFloatVolt, *spinBoostVolt, *spinBoostCurrent,
+                    *spinBoostTime, *spinBoardID;
+
+    QPushButton *btnFloatVolt, *btnBoostVolt, *btnBoostCurr,
+                *btnBoostTime, *btnBoardID, *btnVusb,
+                *btnSetAll, *btnGetAllCfg;
+
+    QCheckBox   *checkVusb;
+
+    QLineEdit   *editChargerStatus, *editBattVolt,
+                *editBattCurr, *editBattCap;
+
+    QTextEdit  *editStatus;
 
     std::shared_ptr<ibc::layer2> ibc_chart_;
+
+    QVBoxLayout *mainLayout;
+    QWidget *centerWidget;
 
 private slots:
     void clearChartScreen();

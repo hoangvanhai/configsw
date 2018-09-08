@@ -163,7 +163,7 @@ void SerialPort::loadAllUiSetup()
     app::appsetting setting = app::config::instance()->get_app_setting();
 
     if(listApp->currentText() == "Debug") {
-        loadSerialSetup(setting.chart);
+        loadSerialSetup(setting.control);
     } else if(listApp->currentText() == "Streaming IBC") {
         loadSerialSetup(setting.stream);
     } else if(listApp->currentText() == "Program") {
@@ -329,7 +329,7 @@ void SerialPort::setSerialPort()
     app::appsetting setting = app::config::instance()->get_app_setting();
 
     if(listApp->currentText() == "Debug") {
-        saveSerialSetup(setting.chart);
+        saveSerialSetup(setting.control);
     } else if(listApp->currentText() == "Streaming IBC") {
         saveSerialSetup(setting.stream);
     } else if(listApp->currentText() == "Program") {

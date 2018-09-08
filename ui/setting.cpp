@@ -32,7 +32,7 @@ void Setting::createIcons()
       */
     serial = new QListWidgetItem(contentsWidget);
 
-    serial->setIcon(QIcon("://icon/usb (1).png"));
+    serial->setIcon(QIcon("://icon/settings.png"));
     serial->setText(tr("Serial Port"));
     serial->setTextAlignment(Qt::AlignCenter);
     serial->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);

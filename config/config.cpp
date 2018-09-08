@@ -12,7 +12,7 @@ config::config()
     setting_.stream.port_name = "COM1";
 #endif
     setting_.stream.baudrate = 115200;
-    setting_.chart = setting_.stream;
+    setting_.control = setting_.stream;
     setting_.program = setting_.stream;
     handle_ = nullptr;
 }
@@ -69,8 +69,8 @@ void config::print_config_serial(const serialport &port)
 
 void config::load_config_all()
 {
-    setting_.chart.conf_name = "debug_port";
-    load_config_serial(setting_.chart);
+    setting_.control.conf_name = "debug_port";
+    load_config_serial(setting_.control);
     setting_.stream.conf_name = "stream_port";
     load_config_serial(setting_.stream);
     setting_.program.conf_name = "program_port";
@@ -83,7 +83,7 @@ void config::load_config_all()
 void config::save_config_all(app::appsetting setting)
 {
     set_app_setting(setting);
-    save_config_serial(setting_.chart);
+    save_config_serial(setting_.control);
     save_config_serial(setting_.stream);
     save_config_serial(setting_.program);
     set_key_value("display", setting.display);

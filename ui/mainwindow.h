@@ -23,8 +23,9 @@ public:
     void createConnection();
     void createTitleButton();
 
+
 public slots:
-    //void close() {qApp->quit();}
+    void updateTheme();
 private:
     QTabWidget *tabWidget;
     QWidget *centerWidget;
@@ -33,6 +34,8 @@ private:
 
     Setting     *setting;
     Develop     *develop;    
+
+    QComboBox   *comTheme;
 
     QPushButton *min, *max, *close;
 

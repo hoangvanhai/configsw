@@ -22,7 +22,7 @@ struct serialport {
 
 
 struct appsetting {
-    serialport chart;
+    serialport control;
     serialport program;
     serialport stream;
     QString display;
