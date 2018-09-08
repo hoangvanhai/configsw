@@ -19,7 +19,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::initVariable()
 {
-    app::config::instance()->open_file("setting.ini");
+    app::config::instance()->open_file("setup.ini");
     app::config::instance()->load_config_all();
 }
 
@@ -80,7 +80,7 @@ void MainWindow::createLayout()
 //    qApp->setFont(font);
 
 
-    setWindowIcon(QIcon("://icon/battery.png"));
+    setWindowIcon(QIcon(":/icon/app.ico"));
     setMinimumSize(1224, 768);
 
     move(QApplication::desktop()->screen()->rect().center() - rect().center());

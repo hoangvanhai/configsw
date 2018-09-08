@@ -8,8 +8,18 @@ QT       += core charts gui serialport gui-private
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = mainwin
+TARGET = BCM    #battery charger managerment
 TEMPLATE = app
+
+CONFIG(release, debug|release) {
+    DESTDIR = .
+    OBJECTS_DIR = .obj
+    MOC_DIR = .moc
+    RCC_DIR = .rcc
+    UI_DIR = .ui
+}
+
+
 
 INCLUDEPATH +=  $$PWD \
                 $$PWD/ui \
@@ -29,6 +39,7 @@ win32 {
     CONFIG += c++11
     LIBS += -lws2_32
     CONFIG += static
+    RC_ICONS = $$PWD\icon\app.ico
 }
 
 unix {
@@ -164,8 +175,7 @@ HEADERS  += ui/mainwindow.h \
     ui/setting/hardware.h \
     ui/setting/permission.h
 
-RESOURCES += \
-    ui/icon.qrc
+RESOURCES += resource.qrc
 
 SUBDIRS += \
     xlsx/xlsx.pro

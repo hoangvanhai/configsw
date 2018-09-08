@@ -1,0 +1,23 @@
+<RCC>
+    <qresource prefix="/">
+        <file>icon/app.ico</file>
+        <file>icon/clear.png</file>
+        <file>icon/device.png</file>
+        <file>icon/function.png</file>
+        <file>icon/internet.png</file>
+        <file>icon/manager.png</file>
+        <file>icon/monitor (1).png</file>
+        <file>icon/monitor.png</file>
+        <file>icon/pause.png</file>
+        <file>icon/play.png</file>
+        <file>icon/play-button (1).png</file>
+        <file>icon/play-button (2).png</file>
+        <file>icon/power.png</file>
+        <file>icon/settings (1).png</file>
+        <file>icon/settings.png</file>
+        <file>icon/setup.png</file>
+        <file>icon/stop.png</file>
+        <file>icon/transfer.png</file>
+        <file>icon/up-arrow.png</file>
+    </qresource>
+</RCC>

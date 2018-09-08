@@ -72,19 +72,19 @@ void Develop::createLayout()
         hLayout->setAlignment(Qt::AlignTop);
 
         btnOpenChart->setFixedSize(50, 50);
-        btnOpenChart->setIcon(QIcon("://icon/play-button (2).png"));
+        btnOpenChart->setIcon(QIcon(":/icon/play-button (2).png"));
         btnOpenChart->setIconSize(QSize(35,35));
         btnOpenChart->setToolTip("open chart port");
         hLayout->addWidget(btnOpenChart);
 
-        btnCloseChart->setIcon(QIcon("://icon/stop.png"));
+        btnCloseChart->setIcon(QIcon(":/icon/stop.png"));
         btnCloseChart->setFixedSize(50, 50);
         btnCloseChart->setIconSize(QSize(35,35));
         btnCloseChart->setToolTip("close data chart");
         btnCloseChart->setEnabled(false);
         hLayout->addWidget(btnCloseChart);
 
-        btnShowChart->setIcon(QIcon("://icon/monitor (1).png"));
+        btnShowChart->setIcon(QIcon(":/icon/monitor (1).png"));
         btnShowChart->setFixedSize(50, 50);
         btnShowChart->setIconSize(QSize(35,35));
         btnShowChart->setToolTip("open data chart");
@@ -109,7 +109,7 @@ void Develop::createLayout()
 
     {
         QHBoxLayout *hLayout = new QHBoxLayout;
-        hLayout->addWidget(new QLabel("FLOAT VOLTAGE"), 1);
+        hLayout->addWidget(new QLabel("FLOAT VOLTAGE (mV)"), 1);
         hLayout->addWidget(spinFloatVolt);
         hLayout->addWidget(btnFloatVolt);
 //        hLayout->addStretch(1);
@@ -117,7 +117,7 @@ void Develop::createLayout()
     }
     {
         QHBoxLayout *hLayout = new QHBoxLayout;
-        hLayout->addWidget(new QLabel("BOOST VOLTAGE"), 1);
+        hLayout->addWidget(new QLabel("BOOST VOLTAGE (mV)"), 1);
         hLayout->addWidget(spinBoostVolt);
         hLayout->addWidget(btnBoostVolt);
 //        hLayout->addStretch(1);
@@ -126,7 +126,7 @@ void Develop::createLayout()
 
     {
         QHBoxLayout *hLayout = new QHBoxLayout;
-        hLayout->addWidget(new QLabel("BOOST CURRENT"), 1);
+        hLayout->addWidget(new QLabel("BOOST CURRENT (mA)"), 1);
         hLayout->addWidget(spinBoostCurrent);
         hLayout->addWidget(btnBoostCurr);
 //        hLayout->addStretch(1);
@@ -135,7 +135,7 @@ void Develop::createLayout()
 
     {
         QHBoxLayout *hLayout = new QHBoxLayout;
-        hLayout->addWidget(new QLabel("BOOST TIME"), 1);
+        hLayout->addWidget(new QLabel("BOOST TIME (min)"), 1);
         hLayout->addWidget(spinBoostTime);
         hLayout->addWidget(btnBoostTime);
 //        hLayout->addStretch(1);
