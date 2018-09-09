@@ -67,6 +67,32 @@ void config::print_config_serial(const serialport &port)
                 "stop bits: " << port.stopbits;
 }
 
+void config::load_battcharg_cfg(battcharg &setting)
+{
+    handle_->beginGroup(setting.conf_name);
+    setting.id          = load_key_value("id", 1).toInt();
+    setting.floatVolt   = load_key_value("floatvolt", 13.8).toDouble();
+    setting.boostVolt   = load_key_value("boostvolt", 14.2).toDouble();
+    setting.boostCurr   = load_key_value("boostcurr", 5.0).toDouble();
+    setting.boostTime   = load_key_value("boosttime", 120.0).toDouble();
+    setting.vUsb        = load_key_value("vusb", 1).toBool();
+    handle_->endGroup();
+}
+
+
+
+void config::save_battcharg_cfg(battcharg &setting)
+{
+    handle_->beginGroup(setting.conf_name);
+    set_key_value("id",         setting.id);
+    set_key_value("floatvolt",  setting.floatVolt);
+    set_key_value("boostvolt",  setting.boostVolt);
+    set_key_value("boostcurr",  setting.boostCurr);
+    set_key_value("boosttime",  setting.boostTime);
+    set_key_value("vusb",       setting.vUsb);
+    handle_->endGroup();
+}
+
 void config::load_config_all()
 {
     setting_.control.conf_name = "debug_port";
@@ -75,6 +101,8 @@ void config::load_config_all()
     load_config_serial(setting_.stream);
     setting_.program.conf_name = "program_port";
     load_config_serial(setting_.program);
+    setting_.batt.conf_name = "batt_charg";
+    load_battcharg_cfg(setting_.batt);
     setting_.display = load_key_value("display", "ascii").toString();
     setting_.protocol = load_key_value("protocol", "raw").toString();
     setting_.palette = load_key_value("palette", "dark").toString();
@@ -86,6 +114,7 @@ void config::save_config_all(app::appsetting setting)
     save_config_serial(setting_.control);
     save_config_serial(setting_.stream);
     save_config_serial(setting_.program);
+    save_battcharg_cfg(setting_.batt);
     set_key_value("display", setting.display);
     set_key_value("protocol", setting.protocol);
     set_key_value("palette", setting.palette);

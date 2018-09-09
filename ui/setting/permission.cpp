@@ -87,7 +87,7 @@ void Permission::updateAppTheme()
         std::cout << "curr text = white\n";
     }
 
-    QFont font("Times New Roman", 12);
+    QFont font("Times New Roman", 11);
     font.setStyleHint(QFont::Monospace);
     qApp->setFont(font);
 

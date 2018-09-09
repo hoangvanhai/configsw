@@ -99,7 +99,10 @@ int layer2::send(uint8_t src, uint8_t dst, uint8_t ctrl, uint8_t *data, int len)
  */
 std::size_t layer2::send_raw_data(const void *data, int len)
 {
-    return serial_->sent_raw_data(data, len);
+    if(status_ == communication::Status_Connected)
+        return serial_->sent_raw_data(data, len);
+    else
+        return 0;
 }
 
 int layer2::check_bit(const uint8_t *org, uint8_t *data, uint32_t size)

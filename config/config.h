@@ -20,15 +20,26 @@ struct serialport {
     bool hwflowctl;
 };
 
+struct battcharg{
+    QString conf_name;
+    int     id;
+    double   floatVolt;
+    double   boostVolt;
+    double   boostCurr;
+    double   boostTime;
+    bool    vUsb;
+};
 
 struct appsetting {
     serialport control;
     serialport program;
     serialport stream;
+    battcharg batt;
     QString display;
     QString protocol;
     QString palette;
 };
+
 
 
 class config : public singleton<config>
@@ -45,6 +56,9 @@ public:
     void save_config_serial(const serialport &port);
 
     void print_config_serial(const serialport &port);
+
+    void load_battcharg_cfg(battcharg &setting);
+    void save_battcharg_cfg(battcharg &setting);
 
     bool contains(const QString &key);
     QVariant load_key_value(const QString &key, QVariant def);

@@ -2,6 +2,7 @@
 #define DEVELOP_H
 
 #include <QtWidgets>
+#include <QTimer>
 #include <QtCharts>
 #include <xlsx/xlsxdocument.h>
 #include <layer2.h>
@@ -10,6 +11,7 @@
 
 class StreamDock;
 class ControlDock;
+
 
 class Develop : public QMainWindow
 {
@@ -22,26 +24,22 @@ public:
     void createContent();
     void createLayout();
     void createConnection();
-    void createTableViewHeader();
-    void initExcelHeader();
-    void appendRow(QStringList &row);
-    void writeRow(QStringList &row);    
+
 signals:
-    void signalStreamEvent(int event);
-    void signalStreamData(uint8_t *data_,
-                         int data_len_);
-    void signalChartEvent(int event);
-    void signalChartData(uint8_t *data,
+
+    void signalConnectionEvent(int event);
+    void signalChargerData(uint8_t *data,
                          int data_len);
 private slots:
-    void openChart();
-    void closeChart();    
-    void showChart();
-    void sendChartData(QString);
-    void recvChartDataEvent(uint8_t *data_,
-                       int data_len_);
+    void openConnection();
+    void closeConnection();
+    void showControlPanel();
+    void recvChargerDataEvent(uint8_t *data_, int data_len_);
+    void recvConnectionEvent(int event);
+    void onTimerClb();
 
-    void recvChartEvent(int event);
+public slots:
+    void onSendData(QString data);
 
 private:
 
@@ -49,16 +47,22 @@ private:
     QVBoxLayout *mainLayout;
     QWidget *centerWidget;
 
-    QToolButton *btnOpenChart, *btnCloseChart, *btnShowChart;
+    QToolButton *btnOpenConnection, *btnCloseConnection,
+                *btnShowControlPanel;
 
     ControlDock *control;
 
-    QToolButton     *btnClear, *btnSave;
+    QToolButton *btnClear, *btnSave;
 
-    std::shared_ptr<ibc::layer2> ibc_chart_;
+    QSplineSeries *series;
+    QChart *ivChart;
+    QValueAxis *ivXAxis;
 
-    QXlsx::Document *msgFile;
-    uint32_t        current_row;
+
+    std::shared_ptr<ibc::layer2> ibc_obj_;
+
+    QTimer  hTimerControl;
+
 };
 
 
@@ -70,7 +74,34 @@ public:
 
     void createElement();
     void createLayout();
+    void createContent();
     void createConnection();
+
+signals:
+    void sigSendData(QString);
+
+private:
+    void sendBoarId(int id);
+    void sendFloatVolt(double value);
+    void sendBoostVolt(double value);
+    void sendBoostCurr(double value);
+    void sendBoostTime(double value);
+    void sendVusb(bool value);
+    void sendAllParam(int id, double fvolt, double bvolt,
+                      double bcurr, double btime, bool vusb);
+    void sendCommand(const QString &cmd);
+
+private slots:
+    void onBtnSetId();
+    void onBtnSetFloatVolt();
+    void onBtnSetBoostVolt();
+    void onBtnSetBoostCurr();
+    void onBtnSetBoostTime();
+    void onBtnSetVusb();
+    void onBtnSetAll();
+    void onBtnGetAll();
+    void onBtnSetDef();
+    void onRecvData(uint8_t *data_, int data_len_);
 
 private:     
     QDoubleSpinBox  *spinFloatVolt, *spinBoostVolt, *spinBoostCurrent,
@@ -78,7 +109,7 @@ private:
 
     QPushButton *btnFloatVolt, *btnBoostVolt, *btnBoostCurr,
                 *btnBoostTime, *btnBoardID, *btnVusb,
-                *btnSetAll, *btnGetAllCfg;
+                *btnSetAll, *btnGetAllCfg, *btnDefault;
 
     QCheckBox   *checkVusb;
 
@@ -86,19 +117,8 @@ private:
                 *editBattCurr, *editBattCap;
 
     QTextEdit  *editStatus;
-
-    std::shared_ptr<ibc::layer2> ibc_chart_;
-
     QVBoxLayout *mainLayout;
     QWidget *centerWidget;
-
-private slots:
-    void clearChartScreen();
-    void saveChartScreen();
-
-public slots:
-    void recvUpdateChart(uint8_t *data, int len);
-
 };
 
 
