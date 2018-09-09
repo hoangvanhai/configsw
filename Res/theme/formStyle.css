@@ -1,0 +1,848 @@
+/*-----------------QMainWindow-----------------*/
+QMainWindow {
+    background-color: black;
+}
+
+QWidget[accessibleName = "panel"] {
+    background-color: #202020;
+}
+QListWidget {
+    background-color: #282828;
+    color: #cccccc;
+    selection-background-color: #586666;
+}
+
+
+
+/*-----------------QLabel-----------------*/
+QLabel { 
+    color: #cccccc;
+    font-family: "Roboto Regular";
+    font: 12px
+}
+
+QLabel[accessibleName = "roundborder"]{
+    background-color: rgb(90, 90, 90);
+    border-radius: 2px;
+    padding: 3px;
+}
+
+
+QLabel[accessibleName = "bold"] {
+    color: #cccccc;
+    font-family: "Roboto Regular";
+    font: bold 11px
+}
+
+QLabel[accessibleName = "medium"] {
+    color: #cccccc;
+    font-family: "Roboto Medium";
+    font: bold 11px
+}
+
+SlideLabel {
+    image-position: right;
+}
+
+
+/*-----------------QPushButton-----------------*/
+
+QPushButton#common {
+    border-image: url(:/Res/01_MAINSCREEN(hidden)/Button chung/UI_chi_tiet_08092017-51.png) ;
+    border: 5px transparent;
+    min-height: 20px;
+    color: #cccccc;
+    font-family: "Roboto Regular";
+    font: 11px;
+    padding: 0 10 2 10px;
+    min-width: 50px;
+}
+
+QPushButton#common:hover {
+    border-image: url(:/Res/01_MAINSCREEN(hidden)/Button chung/UI_chi_tiet_08092017-52.png) ;
+}
+
+QPushButton#common:pressed {
+    border-image: url(:/Res/01_MAINSCREEN(hidden)/Button chung/UI_chi_tiet_08092017-53.png) ;
+    color: black;
+}
+
+QPushButton#common:disabled {
+    border-image: url(:/Res/01_MAINSCREEN(hidden)/Button chung/UI_chi_tiet_08092017-54.png) ;
+}
+
+QPushButton[accessibleName = "common"] {
+    border-image: url(:/Res/01_MAINSCREEN(hidden)/Button chung/UI_chi_tiet_08092017-51.png) ;
+    border: 5px transparent;
+    min-height: 20px;
+    color: #cccccc;
+    font-family: "Roboto Regular";
+    font: 11px;
+    padding: 0 10 2 10px;
+    min-width: 50px;
+}
+
+QPushButton[accessibleName = "common"]:hover {
+    border-image: url(:/Res/01_MAINSCREEN(hidden)/Button chung/UI_chi_tiet_08092017-52.png) ;
+}
+
+QPushButton[accessibleName = "common"]:pressed {
+    border-image: url(:/Res/01_MAINSCREEN(hidden)/Button chung/UI_chi_tiet_08092017-53.png) ;
+    color: black;
+}
+
+QPushButton[accessibleName = "common"]:disabled {
+    border-image: url(:/Res/01_MAINSCREEN(hidden)/Button chung/UI_chi_tiet_08092017-54.png) ;
+}
+
+
+QPushButton:flat {
+    color: #cccccc;
+    font-family: "Roboto Regular";
+    font: bold 12px;
+    background-color: #586666;
+}
+
+QPushButton:flat:hover {
+    background-color: #586666;
+}
+
+QPushButton:flat:pressed {
+    color: white;
+}
+
+/*-----------------QToolButton-----------------*/
+QToolButton {
+    color: #cccccc;
+    background-color: rgb(57, 57, 57);
+    border-width: 1px;
+    border-style: outset;
+    border-color: rgb(90, 90, 90);
+    border-radius: 2px
+}
+
+QToolButton:pressed {
+    background-color: black;
+}
+
+QToolButton:hover {
+    border-color: white;
+}
+
+/*-----------------QMenuBar--------------*/
+QMenuBar {
+    background-color: green;
+    color: #cccccc;
+    spacing: 2px;
+    font-family: "Roboto Regular";
+}
+
+QMenuBar::item {
+    spacing: 10px;
+    padding: 3px 3px 5px 10px;
+    border-width: 0 0 0 1px;
+    border-style: outset;
+    border-color: #4f5051;
+}
+
+QMenuBar::item:selected {
+    color: white;
+    font-family: "Roboto Bold";
+    font: bold;
+}
+
+QMenuBar::item:pressed {
+    /*font-family: "Roboto Bold";*/
+}
+
+QRadioButton {
+    color: #cccccc
+}
+
+
+/*-----------------QSlider-----------------*/
+
+
+QSlider::groove:horizontal {
+    margin: 2px 0;
+    height: 2px;
+}
+
+QSlider::handle:horizontal {
+
+    background: #586666;
+}
+
+QSlider::groove:horizontal:disabled {
+    margin: 2px 0;
+    height: 2px;
+}
+
+QSlider::handle:horizontal:disabled {
+    background: #212121;
+}
+
+
+/*-----------------QMenu-----------------*/
+QMenu {
+    background-color: #1a1a1a;
+    color: #cccccc;
+    font-family: "Roboto Light";
+    border-width: 0 1px 1px 1px;
+    border-style: outset;
+    border-color: #4f5051;
+    border-radius: 2px;
+    spacing: 10px
+}
+
+QMenu[accessibleName = "context"] {
+    border-width: 1px;
+}
+
+QMenu::item {
+    min-height: 20px;
+}
+
+QMenu::item:selected {
+    background-color: #586666;
+    color: white;
+    font-family: "Roboto Medium";
+}
+
+QMenu:icon {
+   background: gray;
+   border: 1px inset gray;
+   position: absolute;
+   top: 1px;
+   right: 1px;
+   bottom: 1px;
+   left: 1px;
+}
+
+QMenu:item:hover {
+    background-color: rgb(0, 0, 255);
+}
+
+
+/*-----------------QLine-----------------*/
+QFrame[accessibleName="line"] {
+    background-color: #58595c;
+    border-bottom-width: 1px;
+    border-color: #cccccc
+}
+
+
+/*-----------------QLineEdit-----------------*/
+QLineEdit {
+    background-color: #282828;
+    color: #cccccc;
+    font-family: "Roboto";
+    font: 12px;
+    border-width: 1px;
+    border-style: outset;
+    border-color: rgb(90, 90, 90);
+    border-radius: 2px;
+
+    padding-top: 1px;
+    padding-bottom: 1px;
+    padding-left: 5px;
+    padding-right: 5px;
+    selection-background-color: #586666;
+}
+
+QLineEdit:hover {
+    border-color: #cccccc;
+}
+
+
+QPlainTextEdit {
+    background-color: #282828;
+    color: #cccccc;
+    font-family: "Roboto";
+    font: 12px;
+    border-width: 1px;
+    border-style: outset;
+    border-color: rgb(90, 90, 90);
+    border-radius: 2px;
+
+    padding-top: 1px;
+    padding-bottom: 1px;
+    padding-left: 5px;
+    padding-right: 5px;
+    selection-background-color: #586666;
+}
+
+
+
+
+
+/*-----------------QComboBox-----------------*/
+
+QComboBox {
+    background-color: #282828;
+    color: #cccccc;
+    font: 12px;
+    border-width: 1px;
+    border-style: outset;
+    border-color: rgb(90, 90, 90);
+    border-radius: 2px;
+
+    padding-top: 1px;
+    padding-bottom: 1px;
+    padding-left: 8px;
+    padding-right: 8px;
+}
+
+QComboBox:hover {
+    border-color: #cccccc;
+}
+
+QComboBox::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    color: white;
+    font-family: "Roboto";
+    width: 15px;
+    margin: 1px;
+    background-color: #58595b;
+    border-top-right-radius: 2px;
+    border-bottom-right-radius: 2px;
+    selection-background-color: #586666;
+
+}
+
+QComboBox::down-arrow {
+    image: url(:/Res/01_MAINSCREEN(hidden)/Nhiemvu_arrow/UI_chi_tiet_08092017-05.png);
+}
+
+QComboBox::down-arrow:on {
+    image: url(:/Res/01_MAINSCREEN(hidden)/Nhiemvu_arrow/UI_chi_tiet_08092017-04.png);
+}
+
+QComboBox QAbstractItemView {
+    background-color: #282828;
+    selection-background-color: #586666;
+    color: white;
+    font-family: "Roboto";
+}
+
+QComboBox QAbstractItemView:focus {
+    outline: none;
+}
+
+QComboBox QAbstractItemView::item {
+    padding: 2px;
+    selection-background-color: #586666;
+}
+
+QComboBox QAbstractItemView::item:selected {
+    background-color: #586666;
+}
+
+
+/*-----------------QDockWidget-----------------*/
+QDockWidget:title {
+    background-color: rgb(90, 90, 90);
+    padding-top: 5px;
+    padding-bottom: 1px;
+    padding-left: 20px;
+}
+
+QDockWidget {
+    color: rgb(185, 185, 185);
+    font: "Roboto Medium"
+}
+
+
+/*-----------------QDialog-----------------*/
+
+QDialog {
+    background-color: black;
+}
+
+
+
+/*-----------------QTableView-----------------*/
+
+QTableView {
+    color: #cccccc;
+    background-color: #282828;
+    font-family: "Roboto Light";
+    gridline-color: #6d6e71;
+    selection-background-color: #586666;
+    outline: 0;
+}
+
+QTableView QAbstractItemView:focus {
+    outline: none;
+}
+
+QTableView:!active {
+    selection-background-color: #586666;
+    selection-color: #cccccc;
+    color: #cccccc;
+    outline: none;
+}
+
+QTableView QTableCornerButton::section {
+    background-color: #3d3d3d;
+    border-style:none;
+    border-right: 1px solid #6d6e71;
+    border-bottom: 1px solid #6d6e71;
+}
+
+
+/*-----------------QHeaderView-----------------*/
+
+QHeaderView {
+    background-color: #3d3d3d;
+    color: green;
+    font-family: "Roboto Regular";
+}
+
+QHeaderView::section {
+    background: #3d3d3d;
+    color: #cccccc;
+    font-family: "Roboto";
+    font: bold;
+}
+
+
+QHeaderView::section:horizontal {
+    height: 24px;
+    border-style:none;
+    border-right: 1px solid #6d6e71;
+    border-bottom: 1px solid #6d6e71;
+}
+
+QHeaderView::section:vertical {
+    width: 36px;
+    border-style:none;
+    border-bottom: 1px solid #6d6e71;
+    border-right: 1px solid #6d6e71;
+    position: right;
+}
+
+
+
+
+/*-----------------QScrollBar-----------------*/
+
+QScrollBar:vertical {
+    border-style: none;
+    width: 14px;
+    margin: 13px 0px 13px 0px;
+    background-color: #282828;
+    border-left: 1px solid #6d6e71;
+    border-right: 1px solid #6d6e71;
+}
+
+
+
+QScrollBar::handle:vertical {
+    background-color: #58595b;
+    min-height: 30px;
+    margin: 1px;
+    width: 2px;
+}
+
+QScrollBar::add-line:vertical {
+    height: 15px;
+    subcontrol-position: bottom;
+    subcontrol-origin: margin;
+    image: url(:/Res/01_MAINSCREEN(hidden)/Scrollbar arrow/UI_chi_tiet_08092017-24.png);
+    border-left: 1px solid #6d6e71;
+    border-right: 1px solid #6d6e71;
+    border-bottom: 1px solid #6d6e71;
+}
+
+QScrollBar::add-line:vertical:hover { image: url(:/Res/Main screen/Scrollbar arrow/Hover/UI_chi_tiet_08092017-75.png) }
+QScrollBar::sub-line:vertical:hover { image: url(:/Res/Main screen/Scrollbar arrow/Hover/UI_chi_tiet_08092017-73.png) }
+QScrollBar::add-line:vertical:pressed { image: url(:/Res/Main screen/Scrollbar arrow/Hover/UI_chi_tiet_08092017-74.png) }
+QScrollBar::sub-line:vertical:pressed { image: url(:/Res/Main screen/Scrollbar arrow/Hover/UI_chi_tiet_08092017-72.png) }
+
+
+QScrollBar::sub-line:vertical {
+    height: 14px;
+    subcontrol-position: top;
+    subcontrol-origin: margin;
+    image: url(:/Res/01_MAINSCREEN(hidden)/Scrollbar arrow/UI_chi_tiet_08092017-25.png);
+    border-left: 1px solid #6d6e71;
+    border-right: 1px solid #6d6e71;
+    border-top: 1px solid #6d6e71;
+}
+
+QScrollBar::sub-page:vertical {
+    background: #282828;
+}
+QScrollBar::add-page:vertical {
+    background: #282828;
+}
+
+
+QScrollBar:horizontal {
+    border-style: none;
+    height: 14px;
+    margin: 0 13px 0 13px;
+    background-color: #282828;
+    border-top: 1px solid #6d6e71;
+    border-bottom: 1px solid #6d6e71;
+}
+
+QScrollBar::handle:horizontal {
+    background-color: #58595b;
+    min-width: 30px;
+    margin: 1px;
+    width: 2px;
+}
+
+QScrollBar::add-line:horizontal {
+    width: 15px;
+    subcontrol-position: right;
+    subcontrol-origin: margin;
+    image: url(:/Res/01_MAINSCREEN(hidden)/Scrollbar arrow/UI_chi_tiet_08092017-23.png);
+    border-top: 1px solid #6d6e71;
+    border-right: 1px solid #6d6e71;
+    border-bottom: 1px solid #6d6e71;
+}
+
+QScrollBar::sub-line:horizontal {
+    width: 14px;
+    subcontrol-position: left;
+    subcontrol-origin: margin;
+    image: url(:/Res/01_MAINSCREEN(hidden)/Scrollbar arrow/UI_chi_tiet_08092017-22.png);
+    border-left: 1px solid #6d6e71;
+    border-bottom: 1px solid #6d6e71;
+    border-top: 1px solid #6d6e71;
+}
+
+QScrollBar::sub-page:horizontal {
+    background: #282828;
+}
+QScrollBar::add-page:horizontal {
+    background: #282828;
+}
+
+QScrollbar:horizontal:hover {
+    border: #cccccc;
+}
+
+QScrollBar::add-line:horizontal:hover { image: url(:/Res/Main screen/Scrollbar arrow/Hover/UI_chi_tiet_08092017-71.png) }
+QScrollBar::sub-line:horizontal:hover { image: url(:/Res/Main screen/Scrollbar arrow/Hover/UI_chi_tiet_08092017-69.png) }
+QScrollBar::add-line:horizontal:pressed { image: url(:/Res/Main screen/Scrollbar arrow/Hover/UI_chi_tiet_08092017-70.png) }
+QScrollBar::sub-line:horizontal:pressed { image: url(:/Res/Main screen/Scrollbar arrow/Hover/UI_chi_tiet_08092017-68.png) }
+
+
+/*-----------------QGroupBox-----------------*/
+
+QGroupBox {
+    color: #cccccc;
+    border: 1px solid #6d6e71;
+    border-radius: 1px;
+    margin-top: 2ex;
+}
+
+QGroupBox::title {
+    padding: 0 3px;
+    subcontrol-origin: margin;
+    subcontrol-position: top center;
+}
+
+
+/*-----------------QSplitter-----------------*/
+
+QSplitter::handle:vertical {
+    background-color: transparent;
+}
+
+QSplitter::handle:horizontal {
+    background-color: transparent;
+}
+
+
+/*-----------------QSpinBox-----------------*/
+
+QSpinBox {
+    background-color: #282828;
+    color: #cccccc;
+    font-family: "Roboto";
+    font: 12px;
+    border-width: 1px;
+    border-style: outset;
+    border-color: #58595b;
+    border-radius: 1px;
+
+    padding-top: 1px;
+    padding-bottom: 1px;
+    padding-left: 5px;
+    padding-right: 5px;
+    selection-background-color: #586666;
+}
+QSpinBox:hover {
+    border-color: #cccccc
+}
+
+QSpinBox::up-button {
+    subcontrol-origin: border;
+    subcontrol-position: top right;
+    background-color: #aaaaaa;
+    border-image: url(:/Res/01_MAINSCREEN(hidden)/Text box arrow/UI_chi_tiet_08092017-07.png);
+    margin: 1px 1px 0px 0px;
+    width: 14px;
+}
+
+QSpinBox::down-button {
+    subcontrol-origin: border;
+    subcontrol-position: bottom right;
+    background-color: #aaaaaa;
+    border-image: url(:/Res/01_MAINSCREEN(hidden)/Text box arrow/UI_chi_tiet_08092017-08.png);
+    width: 14px;
+    margin: 1px 1px 1px 0px;
+}
+
+QSpinBox::up-button:pressed, QSpinBox::down-button:pressed {
+    background-color: #58595b;
+}
+
+QSpinBox::up-button:disabled, QSpinBox::down-button:disabled {
+    border-image: none;
+}
+
+
+/*-----------------QCheckBox-----------------*/
+
+QCheckBox {
+    color: #cccccc;
+    font-family: "Roboto Regular";
+    font: 12px
+}
+
+QCheckBox::indicator:unchecked {
+    image: url(:/Res/02_MAINSCREEN(unhidden)/Check box/UI_chi_tiet_08092017-69.png);
+}
+
+QCheckBox::indicator:checked {
+    image: url(:/Res/02_MAINSCREEN(unhidden)/Check box/UI_chi_tiet_08092017-70.png);
+}
+
+
+/*-----------------QTabWidget-----------------*/
+
+QTabWidget::pane {
+    background-color: #282828;
+    position: absolute;
+    top: -0.1em;
+}
+
+QTabWidget::tab-bar {
+    background-color: #282828;
+    alignment: center;
+}
+
+QTabWidget > QWidget {
+    background-color: #282828;
+    border-top: 1px solid #6d6e71;
+}
+
+QTabBar::tab {
+    min-width: 100px;
+    height: 25px;
+    background-color: #282828;
+    color: #cccccc;
+    border-bottom: 1px solid #6d6e71;
+}
+
+QTabBar::tab:selected{
+    border-top: 1px solid #6d6e71;
+    border-left: 1px solid #6d6e71;
+    border-right: 1px solid #6d6e71;
+    border-bottom: none;
+    color: white;
+}
+
+/*-----------------Customing size of small button-----------------*/
+
+#btAdd, #btEdit, #btVerify, #btRemove, #btConfig,
+#btPlayPause, #btHome, #btLink, #btCapture, #btFullScreen, #btBack, #btForward, #btHome, #btColorPicker {
+    border: 6px transparent;
+    background-color: transparent;
+    max-height: 18px;
+    min-height: 18px;
+    max-width: 18px;
+    min-width: 18px;
+    border-image: 5 5 5 5;
+}
+
+#btMinimize, #btExit {
+    border: 6px transparent;
+    background-color: transparent;
+    max-height: 15px;
+    min-height: 15px;
+    max-width: 15px;
+    min-width: 15px;
+    border-image: 3;
+}
+
+#btMaximize {
+    max-height: 27px;
+    min-height: 27px;
+    max-width: 27px;
+    min-width: 27px;
+}
+
+#btMinimize             { border-image: url(:/Res/Main screen/Close software/UI_chi_tiet_08092017-32.png)}
+#btMinimize:hover         { border-image: url(:/Res/Main screen/Close software/UI_chi_tiet_08092017-33.png)}
+#btMinimize:pressed       { border-image: url(:/Res/Main screen/Close software/UI_chi_tiet_08092017-34.png)}
+#btMinimize:disabled      { border-image: url(:/Res/Main screen/Close software/UI_chi_tiet_08092017-35.png)}
+
+#btMaximize::indicator:unchecked            { image: url(:/Res/Main screen/Close software/UI_chi_tiet_08092017-36.png); }
+#btMaximize::indicator:unchecked:hover      { image: url(:/Res/Main screen/Close software/UI_chi_tiet_08092017-37.png); }
+#btMaximize::indicator:unchecked:pressed    { image: url(:/Res/Main screen/Close software/UI_chi_tiet_08092017-38.png); }
+#btMaximize::indicator:unchecked:disabled   { image: url(:/Res/Main screen/Close software/UI_chi_tiet_08092017-39.png); }
+
+#btMaximize::indicator:checked              { image: url(:/Res/Main screen/Close software/UI_chi_tiet_08092017-40.png); }
+#btMaximize::indicator:checked:hover    { image: url(:/Res/Main screen/Close software/UI_chi_tiet_08092017-41.png); }
+#btMaximize::indicator:checked:pressed  { image: url(:/Res/Main screen/Close software/UI_chi_tiet_08092017-42.png); }
+#btMaximize::indicator:checked:disabled { image: url(:/Res/Main screen/Close software/UI_chi_tiet_08092017-43.png); }
+
+
+
+#btExit               { border-image: url(:/Res/Main screen/Close software/UI_chi_tiet_08092017-44.png)}
+#btExit:hover         { border-image: url(:/Res/Main screen/Close software/UI_chi_tiet_08092017-45.png)}
+#btExit:pressed       { border-image: url(:/Res/Main screen/Close software/UI_chi_tiet_08092017-46.png)}
+#btExit:disabled      { border-image: url(:/Res/Main screen/Close software/UI_chi_tiet_08092017-47.png)}
+
+
+/*-----------------Customing image of small button-----------------*/
+#btAdd                  { border-image: url(:/Res/03_MAINSCREEN_Nhiem vu/Them/UI_chi_tiet_08092017-71.png)}
+#btAdd:hover            { border-image: url(:/Res/03_MAINSCREEN_Nhiem vu/Them/UI_chi_tiet_08092017-72.png)}
+#btAdd:pressed          { border-image: url(:/Res/03_MAINSCREEN_Nhiem vu/Them/UI_chi_tiet_08092017-73.png)}
+#btAdd:disabled         { border-image: url(:/Res/03_MAINSCREEN_Nhiem vu/Them/UI_chi_tiet_08092017-74.png)}
+
+#btEdit                 { border-image: url(:/Res/03_MAINSCREEN_Nhiem vu/Sua/UI_chi_tiet_08092017-75.png)}
+#btEdit:hover           { border-image: url(:/Res/03_MAINSCREEN_Nhiem vu/Sua/UI_chi_tiet_08092017-76.png)}
+#btEdit:pressed         { border-image: url(:/Res/03_MAINSCREEN_Nhiem vu/Sua/UI_chi_tiet_08092017-77.png)}
+#btEdit:disabled        { border-image: url(:/Res/03_MAINSCREEN_Nhiem vu/Sua/UI_chi_tiet_08092017-78.png)}
+
+#btRemove               { border-image: url(:/Res/03_MAINSCREEN_Nhiem vu/Xoa/UI_chi_tiet_08092017-79.png)}
+#btRemove:hover         { border-image: url(:/Res/03_MAINSCREEN_Nhiem vu/Xoa/UI_chi_tiet_08092017-80.png)}
+#btRemove:pressed       { border-image: url(:/Res/03_MAINSCREEN_Nhiem vu/Xoa/UI_chi_tiet_08092017-81.png)}
+#btRemove:disabled      { border-image: url(:/Res/03_MAINSCREEN_Nhiem vu/Xoa/UI_chi_tiet_08092017-82.png)}
+
+#btVerify               { border-image: url(:/Res/03_MAINSCREEN_Nhiem vu/Active/UI_chi_tiet_08092017-83.png)}
+#btVerify:hover         { border-image: url(:/Res/03_MAINSCREEN_Nhiem vu/Active/UI_chi_tiet_08092017-84.png)}
+#btVerify:pressed       { border-image: url(:/Res/03_MAINSCREEN_Nhiem vu/Active/UI_chi_tiet_08092017-85.png)}
+#btVerify:disabled      { border-image: url(:/Res/03_MAINSCREEN_Nhiem vu/Active/UI_chi_tiet_08092017-86.png)}
+
+#btConfig               { border-image: url(:/Res/Main screen _ Nhiem vu/Setting button/Setting_normal.png)}
+#btConfig:hover         { border-image: url(:/Res/Main screen _ Nhiem vu/Setting button/Setting_hover.png)}
+#btConfig:pressed       { border-image: url(:/Res/Main screen _ Nhiem vu/Setting button/Setting_press.png)}
+#btConfig:disabled      { border-image: url(:/Res/Main screen _ Nhiem vu/Setting button/Setting_disable.png)}
+
+
+#btFullScreen           { border-image: url(:/Res/01_MAINSCREEN(hidden)/Fullscreen/UI_chi_tiet_08092017-35.png)}
+#btFullScreen:hover     { border-image: url(:/Res/01_MAINSCREEN(hidden)/Fullscreen/UI_chi_tiet_08092017-36.png)}
+#btFullScreen:pressed   { border-image: url(:/Res/01_MAINSCREEN(hidden)/Fullscreen/UI_chi_tiet_08092017-37.png)}
+#btFullScreen:disabled  { border-image: url(:/Res/01_MAINSCREEN(hidden)/Fullscreen/UI_chi_tiet_08092017-38.png)}
+
+#btPlayPause            { border-image: url(:/Res/01_MAINSCREEN(hidden)/Play -Pause/UI_chi_tiet_08092017-43.png)}
+#btPlayPause:hover      { border-image: url(:/Res/01_MAINSCREEN(hidden)/Play -Pause/UI_chi_tiet_08092017-44.png)}
+#btPlayPause:pressed    { border-image: url(:/Res/01_MAINSCREEN(hidden)/Play -Pause/UI_chi_tiet_08092017-45.png)}
+#btPlayPause:disabled   { border-image: url(:/Res/01_MAINSCREEN(hidden)/Play -Pause/UI_chi_tiet_08092017-46.png)}
+
+#btHome                 { border-image: url(:/Res/02_MAINSCREEN(unhidden)/Home/UI_chi_tiet_08092017-57.png)}
+#btHome:hover           { border-image: url(:/Res/02_MAINSCREEN(unhidden)/Home/UI_chi_tiet_08092017-58.png)}
+#btHome:pressed         { border-image: url(:/Res/02_MAINSCREEN(unhidden)/Home/UI_chi_tiet_08092017-59.png)}
+#btHome:disabled        { border-image: url(:/Res/02_MAINSCREEN(unhidden)/Home/UI_chi_tiet_08092017-60.png)}
+
+#btLink                 { border-image: url(:/Res/02_MAINSCREEN(unhidden)/Link/UI_chi_tiet_08092017-61.png)}
+#btLink:hover           { border-image: url(:/Res/02_MAINSCREEN(unhidden)/Link/UI_chi_tiet_08092017-62.png)}
+#btLink:pressed         { border-image: url(:/Res/02_MAINSCREEN(unhidden)/Link/UI_chi_tiet_08092017-63.png)}
+#btLink:disabled        { border-image: url(:/Res/02_MAINSCREEN(unhidden)/Link/UI_chi_tiet_08092017-64.png)}
+
+#btCapture              { border-image: url(:/Res/02_MAINSCREEN(unhidden)/Screenshot/UI_chi_tiet_08092017-65.png)}
+#btCapture:hover        { border-image: url(:/Res/02_MAINSCREEN(unhidden)/Screenshot/UI_chi_tiet_08092017-66.png)}
+#btCapture:pressed      { border-image: url(:/Res/02_MAINSCREEN(unhidden)/Screenshot/UI_chi_tiet_08092017-67.png)}
+#btCapture:disabled     { border-image: url(:/Res/02_MAINSCREEN(unhidden)/Screenshot/UI_chi_tiet_08092017-68.png)}
+
+#btBack                 { border-image: url(:/Res/01_MAINSCREEN(hidden)/Back/UI_chi_tiet_08092017-27.png)}
+#btBack:hover           { border-image: url(:/Res/01_MAINSCREEN(hidden)/Back/UI_chi_tiet_08092017-28.png)}
+#btBack:pressed         { border-image: url(:/Res/01_MAINSCREEN(hidden)/Back/UI_chi_tiet_08092017-29.png)}
+#btBack:disabled        { border-image: url(:/Res/01_MAINSCREEN(hidden)/Back/UI_chi_tiet_08092017-30.png)}
+
+#btForward              { border-image: url(:/Res/01_MAINSCREEN(hidden)/Next/UI_chi_tiet_08092017-31.png)}
+#btForward:hover        { border-image: url(:/Res/01_MAINSCREEN(hidden)/Next/UI_chi_tiet_08092017-32.png)}
+#btForward:pressed      { border-image: url(:/Res/01_MAINSCREEN(hidden)/Next/UI_chi_tiet_08092017-33.png)}
+#btForward:disabled     { border-image: url(:/Res/01_MAINSCREEN(hidden)/Next/UI_chi_tiet_08092017-34.png)}
+
+#btHome                 { border-image: url(:/Res/02_MAINSCREEN(unhidden)/Home/UI_chi_tiet_08092017-58.png)}
+#btHome:hover           { border-image: url(:/Res/02_MAINSCREEN(unhidden)/Home/UI_chi_tiet_08092017-59.png)}
+#btHome:pressed         { border-image: url(:/Res/02_MAINSCREEN(unhidden)/Home/UI_chi_tiet_08092017-60.png)}
+#btHome:disabled        { border-image: url(:/Res/02_MAINSCREEN(unhidden)/Home/UI_chi_tiet_08092017-61.png)}
+
+#btColorPicker               { border-image: url(:/Res/07_MAP/Color_wheel.png)}
+#btColorPicker:hover         { border-image: url(:/Res/07_MAP/Color_wheel.png)}
+#btColorPicker:pressed       { border-image: url(:/Res/07_MAP/Color_wheel.png)}
+#btColorPicker:disabled      { border-image: url(:/Res/07_MAP/Color_wheel.png)}
+
+/*#btVerify             { border-image: url()}
+#btVerify:hover         { border-image: url()}
+#btVerify:pressed       { border-image: url()}
+#btVerify:disabled      { border-image: url()}*/
+
+#cbPlayPause::indicator:unchecked           { image: url(:/Res/01_MAINSCREEN(hidden)/Play -Pause/UI_chi_tiet_08092017-43.png); }
+#cbPlayPause::indicator:unchecked:hover     { image: url(:/Res/01_MAINSCREEN(hidden)/Play -Pause/UI_chi_tiet_08092017-44.png); }
+#cbPlayPause::indicator:unchecked:pressed   { image: url(:/Res/01_MAINSCREEN(hidden)/Play -Pause/UI_chi_tiet_08092017-45.png); }
+#cbPlayPause::indicator:unchecked:disabled  { image: url(:/Res/01_MAINSCREEN(hidden)/Play -Pause/UI_chi_tiet_08092017-46.png); }
+
+#cbPlayPause::indicator:checked             { image: url(:/Res/01_MAINSCREEN(hidden)/Play -Pause/UI_chi_tiet_08092017-47.png); }
+#cbPlayPause::indicator:checked:hover       { image: url(:/Res/01_MAINSCREEN(hidden)/Play -Pause/UI_chi_tiet_08092017-48.png); }
+#cbPlayPause::indicator:checked:pressed     { image: url(:/Res/01_MAINSCREEN(hidden)/Play -Pause/UI_chi_tiet_08092017-49.png); }
+#cbPlayPause::indicator:checked:disabled    { image: url(:/Res/01_MAINSCREEN(hidden)/Play -Pause/UI_chi_tiet_08092017-50.png); }
+
+
+
+
+
+
+LiveMonitorBar:horizontal {
+    border-style: none;
+    height: 14px;
+    background-color: black;
+    border: 1px solid #6d6e71;
+    min-height: 18px;
+}
+
+LiveMonitorBar::handle:horizontal {
+    background-color: #58595b;
+    border: 1px solid #6d6e71;
+    margin: -1;
+    min-width: 5px;
+}
+
+LiveMonitorBar::add-line:horizontal {
+    width: 0px;
+}
+
+LiveMonitorBar::sub-line:horizontal {
+    width: 0px;
+}
+
+LiveMonitorBar::sub-page:horizontal {
+    background: black;
+}
+
+LiveMonitorBar::add-page:horizontal {
+    background: black;
+}
+
+MyMapWidget {
+    border: 10px red;
+}
+
+
+
+
+
+
+

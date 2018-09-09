@@ -1,0 +1,14 @@
+QCheckBox::indicator:checked            { image: url(:/Res/Main screen/Volume/UI_chi_tiet_08092017-48.png); }
+QCheckBox::indicator:checked:hover      { image: url(:/Res/Main screen/Volume/UI_chi_tiet_08092017-49.png); }
+QCheckBox::indicator:checked:pressed    { image: url(:/Res/Main screen/Volume/UI_chi_tiet_08092017-50.png); }
+QCheckBox::indicator:checked:disabled   { image: url(:/Res/Main screen/Volume/UI_chi_tiet_08092017-51.png); }
+
+
+QCheckBox::indicator:unchecked          { image: url(:/Res/Main screen/Volume/UI_chi_tiet_08092017-52.png); }
+QCheckBox::indicator:unchecked:hover    { image: url(:/Res/Main screen/Volume/UI_chi_tiet_08092017-53.png); }
+QCheckBox::indicator:unchecked:pressed  { image: url(:/Res/Main screen/Volume/UI_chi_tiet_08092017-54.png); }
+QCheckBox::indicator:unchecked:disabled { image: url(:/Res/Main screen/Volume/UI_chi_tiet_08092017-55.png); }
+
+
+
+
