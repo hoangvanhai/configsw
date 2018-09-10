@@ -1,4 +1,5 @@
 #include "layer1.h"
+#include <cstring>
 //using namespace std::literals::chrono_literals;
 using namespace communication::endpoint::serialport;
 
@@ -41,7 +42,8 @@ void layer1::thread_function()
         }
 
         if (event & communication::Event_Readable) {
-            std::this_thread::sleep_for(std::chrono::milliseconds(2));
+            std::this_thread::sleep_for(std::chrono::milliseconds(20));
+            memset(rxBuff, 0, 4096);
             int rlen = sock->readData(rxBuff, 4096);            
             if (rlen > 0) {
                 err_cnt = 0;
@@ -144,6 +146,15 @@ std::size_t layer1::sent_raw_data(const void *data, std::size_t len)
         std::cout << "event not writable\n";
         return -3;
     }
+
+    uint8_t *pData = (uint8_t*)data;
+
+    for(int i = 0; i < len; i++) {
+        printf("0x%x-", (int)pData[i]);
+    }
+
+    printf("\r\n");
+    fflush(stdout);
 
     return sock->writeData(data, len);
 }

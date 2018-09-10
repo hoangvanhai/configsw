@@ -9,7 +9,7 @@ layer2::layer2()
     serial_ = std::make_shared<layer1>();
     notify_ = nullptr;
     start_ = false;
-
+    status_ = communication::Status_Disconnected;
 }
 
 layer2::~layer2()

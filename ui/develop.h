@@ -7,11 +7,7 @@
 #include <xlsx/xlsxdocument.h>
 #include <layer2.h>
 #include <config/config.h>
-
-
-class StreamDock;
-class ControlDock;
-
+#include <controldock.h>
 
 class Develop : public QMainWindow
 {
@@ -28,15 +24,17 @@ public:
 signals:
 
     void signalConnectionEvent(int event);
-    void signalChargerData(uint8_t *data,
-                         int data_len);
+    void signalChargerData(const QString &string);
+    void signalEnablePanel(bool en);
 private slots:
     void openConnection();
     void closeConnection();
     void showControlPanel();
-    void recvChargerDataEvent(uint8_t *data_, int data_len_);
+    void recvChargerDataEvent(const QString &string);
     void recvConnectionEvent(int event);
     void onTimerClb();
+    void onShowStatusMsg(const QString &status);
+    void readData();
 
 public slots:
     void onSendData(QString data);
@@ -47,7 +45,8 @@ private:
     QVBoxLayout *mainLayout;
     QWidget *centerWidget;
 
-    QToolButton *btnOpenConnection, *btnCloseConnection,
+    QToolButton *btnOpenConnection,
+                *btnCloseConnection,
                 *btnShowControlPanel;
 
     ControlDock *control;
@@ -58,6 +57,7 @@ private:
     QChart *ivChart;
     QValueAxis *ivXAxis;
 
+    QSerialPort *m_serial = nullptr;
 
     std::shared_ptr<ibc::layer2> ibc_obj_;
 
@@ -66,60 +66,6 @@ private:
 };
 
 
-
-class ControlDock : public QDockWidget {
-    Q_OBJECT
-public:
-    explicit ControlDock(const QString &name, QWidget *parent = 0);
-
-    void createElement();
-    void createLayout();
-    void createContent();
-    void createConnection();
-
-signals:
-    void sigSendData(QString);
-
-private:
-    void sendBoarId(int id);
-    void sendFloatVolt(double value);
-    void sendBoostVolt(double value);
-    void sendBoostCurr(double value);
-    void sendBoostTime(double value);
-    void sendVusb(bool value);
-    void sendAllParam(int id, double fvolt, double bvolt,
-                      double bcurr, double btime, bool vusb);
-    void sendCommand(const QString &cmd);
-
-private slots:
-    void onBtnSetId();
-    void onBtnSetFloatVolt();
-    void onBtnSetBoostVolt();
-    void onBtnSetBoostCurr();
-    void onBtnSetBoostTime();
-    void onBtnSetVusb();
-    void onBtnSetAll();
-    void onBtnGetAll();
-    void onBtnSetDef();
-    void onRecvData(uint8_t *data_, int data_len_);
-
-private:     
-    QDoubleSpinBox  *spinFloatVolt, *spinBoostVolt, *spinBoostCurrent,
-                    *spinBoostTime, *spinBoardID;
-
-    QPushButton *btnFloatVolt, *btnBoostVolt, *btnBoostCurr,
-                *btnBoostTime, *btnBoardID, *btnVusb,
-                *btnSetAll, *btnGetAllCfg, *btnDefault;
-
-    QCheckBox   *checkVusb;
-
-    QLineEdit   *editChargerStatus, *editBattVolt,
-                *editBattCurr, *editBattCap;
-
-    QTextEdit  *editStatus;
-    QVBoxLayout *mainLayout;
-    QWidget *centerWidget;
-};
 
 
 #endif // DEVELOP_H

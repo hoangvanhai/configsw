@@ -21,13 +21,14 @@ struct serialport {
 };
 
 struct battcharg{
-    QString conf_name;
-    int     id;
+    QString  conf_name;
+    int      id;
     double   floatVolt;
     double   boostVolt;
     double   boostCurr;
     double   boostTime;
-    bool    vUsb;
+    bool     vUsb;
+    bool     dataLog;
 };
 
 struct appsetting {
@@ -35,6 +36,7 @@ struct appsetting {
     serialport program;
     serialport stream;
     battcharg batt;
+    battcharg battdef;
     QString display;
     QString protocol;
     QString palette;
@@ -57,7 +59,7 @@ public:
 
     void print_config_serial(const serialport &port);
 
-    void load_battcharg_cfg(battcharg &setting);
+    void load_battcharg_cfg(battcharg &setting, battcharg def);
     void save_battcharg_cfg(battcharg &setting);
 
     bool contains(const QString &key);

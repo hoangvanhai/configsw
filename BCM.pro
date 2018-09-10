@@ -101,7 +101,8 @@ SOURCES += main.cpp\
     xlsx/xlsxzipwriter.cpp \
     ui/setting/serialport.cpp \
     ui/setting/hardware.cpp \
-    ui/setting/permission.cpp
+    ui/setting/permission.cpp \
+    ui/controldock.cpp
 
 HEADERS  += ui/mainwindow.h \
     ui/develop.h \
@@ -173,7 +174,8 @@ HEADERS  += ui/mainwindow.h \
     xlsx/xlsxzipwriter_p.h \
     ui/setting/serialport.h \
     ui/setting/hardware.h \
-    ui/setting/permission.h
+    ui/setting/permission.h \
+    ui/controldock.h
 
 RESOURCES += resource.qrc
 
