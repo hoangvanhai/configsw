@@ -131,25 +131,6 @@ void Develop::openConnection()
 {
 
     app::appsetting setting = app::config::instance()->get_app_setting();
-
-//    m_serial->setPortName(setting.control.port_name);
-//    m_serial->setBaudRate(setting.control.baudrate);
-//    m_serial->setDataBits(QSerialPort::Data8);
-//    m_serial->setParity(QSerialPort::NoParity);
-//    m_serial->setStopBits(QSerialPort::OneStop);
-//    m_serial->setFlowControl(QSerialPort::NoFlowControl);
-//    if (m_serial->open(QIODevice::ReadWrite)) {
-//        statusBar()->showMessage("control port connected to " +
-//                                 app::config::instance()->get_app_setting().control.port_name);
-//        emit signalEnablePanel(true);
-//    } else {
-//        statusBar()->setStyleSheet("QStatusBar { color: red;}");
-//        statusBar()->showMessage("Lost connection with " +
-//                                 app::config::instance()->get_app_setting().control.port_name +
-//                                 " stop control");
-//        emit signalEnablePanel(false);
-//    }
-
     std::cout << "open control \n"; fflush(stdout);
 
     if(ibc_obj_) {
@@ -260,18 +241,12 @@ void Develop::onSendData(QString data)
         uint8_t *sendData = new uint8_t[data.length()];
         uint8_t *pData = (uint8_t*)data.toStdString().c_str();
         for(int i = 0; i < data.toStdString().length(); i++) {
-            printf("0x%x-", (int)pData[i]);
             sendData[i] = pData[i];
         }
-
-        printf("\r\n");
-
         int err = ibc_obj_->send_raw_data(sendData, data.length());
-
         qDebug() << "control send data: " << data << " len " << err;
 
-
-        fflush(stdout);
+        delete[] sendData;
 
     } else {
         QMessageBox::warning(this, "Connection error",

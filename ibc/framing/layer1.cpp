@@ -146,16 +146,6 @@ std::size_t layer1::sent_raw_data(const void *data, std::size_t len)
         std::cout << "event not writable\n";
         return -3;
     }
-
-    uint8_t *pData = (uint8_t*)data;
-
-    for(int i = 0; i < len; i++) {
-        printf("0x%x-", (int)pData[i]);
-    }
-
-    printf("\r\n");
-    fflush(stdout);
-
     return sock->writeData(data, len);
 }
 }

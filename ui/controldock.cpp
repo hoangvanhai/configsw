@@ -235,17 +235,17 @@ void ControlDock::sendBoarId(int id)
 
 void ControlDock::sendFloatVolt(double value)
 {
-    sendCommand("bid " + QString::number(value));
+    sendCommand("bid " + QString::number(value * 1000));
 }
 
 void ControlDock::sendBoostVolt(double value)
 {
-    sendCommand("bvolt " + QString::number(value));
+    sendCommand("bvolt " + QString::number(value * 1000));
 }
 
 void ControlDock::sendBoostCurr(double value)
 {
-    sendCommand("bcurr " + QString::number(value));
+    sendCommand("bcurr " + QString::number(value * 1000));
 }
 
 void ControlDock::sendBoostTime(double value)
@@ -428,97 +428,127 @@ void ControlDock::onRecvData(const QString &str)
         QString string = controlString;
         qDebug() << "control string" << controlString;
         controlString = "";
-        if(string.contains("pass")) {
+
+        if(string.contains("invalid value")) {
+            QMessageBox::warning(this, "Wrong", string);
+        }  else if(string.contains("invalid password")) {
+            QMessageBox::warning(this, "Wrong",
+                                 "The password is incorrect !");
+        } else if(string.contains("command success")) {
+            emit showStatusBar("command success");
+        } else if(string.contains("pass")) {
             bool ok;
             QString text = QInputDialog::getText(this, "Admin access",
                                      "Issue password:", QLineEdit::Password,
                                      "", &ok, Qt::MSWindowsFixedSizeDialogHint);
             if (ok && !text.isEmpty()) {
-                sendCommand(text);
+                //sendCommand(text);
+                emit sigSendData(text + "\n");
             }
+        } else if(string.contains("status")) {
+            QString cont = string;
+            QString contdisp, substring;
+            QStringList list;
+            double pi, pv;
+            cont.remove("\r"); cont.remove("\n"); cont.remove("status: ");
+            cont.remove("mA");cont.remove("mV"); cont.remove("mW");
+            cont.remove("*");
+            list = cont.split(" ");
+            int i = 0;
+            for(auto var : list) {
 
-        } else if(string.contains("invalid value")) {
-            QMessageBox::warning(this, "Wrong",
-                                 "The value is invalid !");
-        } else if(string.contains("wrong password")) {
-            QMessageBox::warning(this, "Wrong",
-                                 "The password is incorrect !");
-        } else if(string.contains("command success")) {
-            emit showStatusBar(string);
-        } else {
-            if(string.contains("status")) {
-                QString cont = string;
-                QString contdisp, substring;
-                QStringList list;
-                double pi, pv;
-                cont.remove("\r"); cont.remove("\n"); cont.remove("status: ");
-                cont.remove("mA");cont.remove("mV"); cont.remove("mW");
-                cont.remove("*");
-                list = cont.split(" ");
-                int i = 0;
-                for(auto var : list) {
+                if(var == "ID:" && (list.size() >= i + 1)) {
+                    editID->setText(list.at(i+1));
+                } else if(var == "ST:" && (list.size() >= i + 1)) {
+                    substring = list.at(i+1);
+                    contdisp = "";
+                    if(substring == "0") {
+                        contdisp = "IDLE";
+                    } else if(substring == "1") {
+                        contdisp = "STARTING";
+                    } else if(substring == "2") {
+                        contdisp = "CONST CURRENT";
+                    } else if(substring == "3") {
+                        contdisp = "MPPT";
+                    } else if(substring == "4") {
+                        contdisp = "CONST VOLTAGE";
+                    } else if(substring == "5") {
+                        contdisp = "FLOAT VOLTAGE";
+                    } else if(substring == "6") {
+                        contdisp = "TRANSSISION";
+                    } else {
 
-                    if(var == "ID:" && (list.size() >= i + 1)) {
-                        editID->setText(list.at(i+1));
-                    } else if(var == "ST:" && (list.size() >= i + 1)) {
-                        substring = list.at(i+1);
-                        contdisp = "";
-                        if(substring == "0") {
-                            contdisp = "IDLE";
-                        } else if(substring == "1") {
-                            contdisp = "STARTING";
-                        } else if(substring == "2") {
-                            contdisp = "CONST CURRENT";
-                        } else if(substring == "3") {
-                            contdisp = "MPPT";
-                        } else if(substring == "4") {
-                            contdisp = "CONST VOLTAGE";
-                        } else if(substring == "5") {
-                            contdisp = "FLOAT VOLTAGE";
-                        } else if(substring == "6") {
-                            contdisp = "TRANSSISION";
-                        } else {
-
-                        }
-
-                        if(contdisp != "") {
-                            editSTT->setText(contdisp);
-                        }
-
-                    } else if(var == "PV:" && (list.size() >= i + 1)) {
-                        substring = list.at(i+1);
-                        pv = substring.toDouble() / 1000;
-                        editPV->setText(QString::number(pv));
-                    } else if(var == "PI:" && (list.size() >= i + 1)) {
-                        substring = list.at(i+1);
-                        pi = substring.toDouble() / 1000;
-                        editPI->setText(QString::number(pi));
-                    } else if(var == "PP:" && (list.size() >= i + 1)) {
-                        substring = list.at(i+1);
-                        editPP->setText(QString::number(pi * pv));
-                    } else if(var == "BV:" && (list.size() >= i + 1)) {
-                        substring = list.at(i+1);
-                        editBV->setText(QString::number(substring.toDouble() / 1000));
-                    } else if(var == "BI:" && (list.size() >= i + 1)) {
-                        substring = list.at(i+1);
-                        editBI->setText(QString::number(substring.toDouble() / 1000));
-                    } else if(var == "BC:" && (list.size() >= i + 1)) {
-                        substring = list.at(i+1);
-                        editBC->setText(QString::number(substring.toDouble() / 1000));
                     }
-                    i++;
+
+                    if(contdisp != "") {
+                        editSTT->setText(contdisp);
+                    }
+
+                } else if(var == "PV:" && (list.size() >= i + 1)) {
+                    substring = list.at(i+1);
+                    pv = substring.toDouble() / 1000;
+                    editPV->setText(QString::number(pv));
+                } else if(var == "PI:" && (list.size() >= i + 1)) {
+                    substring = list.at(i+1);
+                    pi = substring.toDouble() / 1000;
+                    editPI->setText(QString::number(pi));
+                } else if(var == "PP:" && (list.size() >= i + 1)) {
+                    substring = list.at(i+1);
+                    editPP->setText(QString::number(pi * pv));
+                } else if(var == "BV:" && (list.size() >= i + 1)) {
+                    substring = list.at(i+1);
+                    editBV->setText(QString::number(substring.toDouble() / 1000));
+                } else if(var == "BI:" && (list.size() >= i + 1)) {
+                    substring = list.at(i+1);
+                    editBI->setText(QString::number(substring.toDouble() / 1000));
+                } else if(var == "BC:" && (list.size() >= i + 1)) {
+                    substring = list.at(i+1);
+                    editBC->setText(QString::number(substring.toDouble() / 1000));
                 }
+                i++;
+            }
+        } else if(string.contains("show config")) {
+            QString cont = string;
+            QString substring;
+            QStringList list;
+            cont.remove("\r"); cont.remove("\n"); cont.remove("show config:");
+            cont.remove("mA");cont.remove("mV"); cont.remove("min");
+            list = cont.split(" ");
+            int i = 0;
+            for(auto var : list) {
+
+                if(var == "bid:" && (list.size() >= i + 1)) {
+                    substring = list.at(i+1);
+                    spinBoardID->setValue(substring.toInt());
+                } else if(var == "charg:" && (list.size() >= i + 1)) {
+
+                } else if(var == "fvolt:" && (list.size() >= i + 1)) {
+                    substring = list.at(i+1);
+                    spinFloatVolt->setValue(substring.toDouble() / 1000);
+                } else if(var == "bvolt:" && (list.size() >= i + 1)) {
+                    substring = list.at(i+1);
+                    spinBoostVolt->setValue(substring.toDouble() / 1000);
+                } else if(var == "btime:" && (list.size() >= i + 1)) {
+                    substring = list.at(i+1);
+                    spinBoostTime->setValue(substring.toDouble() / 1000);
+                }  else if(var == "bcurr:" && (list.size() >= i + 1)) {
+                    substring = list.at(i+1);
+                    spinBoostCurrent->setValue(substring.toDouble() / 1000);
+                } else if(var == "vusb:" && (list.size() >= i + 1)) {
+                    substring = list.at(i+1);
+                    checkEnableLog->setChecked(substring == "on" ? true : false);
+                }
+                i++;
             }
         }
 
         pos = str.lastIndexOf("\r");
-        //qDebug() << "pos " << pos << " str len " << str.length();
         if(pos > 0 && pos < str.length()) {
             temp = str.mid(pos + str.length());
-            //qDebug() << "temp string " << temp;
             controlString = temp;
         }
     }
+
 }
 
 
