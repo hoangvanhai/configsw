@@ -37,7 +37,7 @@ private slots:
     void readData();
 
 public slots:
-    void onSendData(QString data);
+    void onSendData(const std::string &data);
 
 private:
 

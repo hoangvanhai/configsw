@@ -19,17 +19,10 @@ void ControlDock::createElement() {
     spinBoardID = new QDoubleSpinBox;
     checkVusb = new QCheckBox;
     checkEnableLog = new QCheckBox;
-
-    btnBoardID = new QPushButton("SET");
-    btnFloatVolt = new QPushButton("SET");
-    btnBoostVolt = new QPushButton("SET");
-    btnBoostCurr = new QPushButton("SET");
-    btnBoostTime = new QPushButton("SET");
+    checkCharg = new QCheckBox;
     btnSetAll = new QPushButton("SET ALL");
     btnGetAllCfg = new QPushButton("GET CFG");
     btnDefault = new QPushButton("GEN DEF");
-    btnTest = new QPushButton("TEST");
-
 
     mainLayout = new QVBoxLayout;
     centerWidget = new QWidget;
@@ -64,33 +57,30 @@ void ControlDock::createLayout()
 
         gridLayout->addWidget(new QLabel("BOARD ID"), 0, 0);
         gridLayout->addWidget(spinBoardID, 0, 1);
-        gridLayout->addWidget(btnBoardID, 0, 2);
+
         // for set this is padding layout
         gridLayout->addItem(new QSpacerItem(20, 20, QSizePolicy::Expanding), 0, 3);
 
         gridLayout->addWidget(new QLabel("FLOAT VOLTAGE (V)"), 1, 0);
         gridLayout->addWidget(spinFloatVolt, 1, 1);
-        gridLayout->addWidget(btnFloatVolt, 1, 2);
 
         gridLayout->addWidget(new QLabel("BOOST VOLTAGE (V)"), 2, 0);
         gridLayout->addWidget(spinBoostVolt,2, 1);
-        gridLayout->addWidget(btnBoostVolt, 2, 2);
 
         gridLayout->addWidget(new QLabel("BOOST CURRENT (A)"), 3, 0);
         gridLayout->addWidget(spinBoostCurrent, 3, 1);
-        gridLayout->addWidget(btnBoostCurr, 3, 2);
 
         gridLayout->addWidget(new QLabel("BOOST TIME (min)"), 4, 0);
         gridLayout->addWidget(spinBoostTime, 4, 1);
-        gridLayout->addWidget(btnBoostTime, 4, 2);
 
-        gridLayout->addWidget(new QLabel("VUSB ON/OFF"), 5, 0);
-        gridLayout->addWidget(checkVusb, 5, 1);
+        gridLayout->addWidget(new QLabel("CHARGER ENABLE"), 5, 0);
+        gridLayout->addWidget(checkCharg, 5, 1);
 
-        gridLayout->addWidget(new QLabel("DATA VISUALIZATION"), 6, 0);
-        gridLayout->addWidget(checkEnableLog, 6, 1);
+        gridLayout->addWidget(new QLabel("VUSB ENABLE"), 6, 0);
+        gridLayout->addWidget(checkVusb, 6, 1);
 
-        gridLayout->addWidget(btnTest, 7, 2);
+        gridLayout->addWidget(new QLabel("DATA VISUALIZATION"), 7, 0);
+        gridLayout->addWidget(checkEnableLog, 7, 1);
 
         hlayout->addWidget(btnDefault);
         hlayout->addWidget(btnGetAllCfg);
@@ -183,22 +173,17 @@ void ControlDock::createContent()
     spinBoostVolt->setValue(setting.batt.boostVolt);
     spinBoostCurrent->setValue(setting.batt.boostCurr);
     spinBoostTime->setValue(setting.batt.boostTime);
-    checkVusb->setChecked(setting.batt.vUsb == 1 ? true : false);
+    checkVusb->setChecked(setting.batt.vUsb);
+    checkCharg->setChecked(setting.batt.charg);
+    checkEnableLog->setChecked(setting.batt.dataLog);
 }
 
 void ControlDock::createConnection()
 {
-    connect(btnBoardID, SIGNAL(clicked(bool)), this, SLOT(onBtnSetId()));
-    connect(btnFloatVolt, SIGNAL(clicked(bool)), this, SLOT(onBtnSetFloatVolt()));
-    connect(btnBoostVolt, SIGNAL(clicked(bool)), this, SLOT(onBtnSetBoostVolt()));
-    connect(btnBoostCurr, SIGNAL(clicked(bool)), this, SLOT(onBtnSetBoostCurr()));
-    connect(btnBoostTime, SIGNAL(clicked(bool)), this, SLOT(onBtnSetBoostTime()));
-    connect(checkVusb, SIGNAL(stateChanged(int)), this, SLOT(onBtnSetVusb()));
-    connect(checkEnableLog, SIGNAL(stateChanged(int)), this, SLOT(onBtnEnableLog()));
+
     connect(btnSetAll, SIGNAL(clicked(bool)), this, SLOT(onBtnSetAll()));
     connect(btnGetAllCfg, SIGNAL(clicked(bool)), this, SLOT(onBtnGetAll()));
-    connect(btnDefault, SIGNAL(clicked(bool)), this, SLOT(onBtnSetDef()));
-    connect(btnTest, SIGNAL(clicked(bool)), this, SLOT(onBtnTest()));
+    connect(btnDefault, SIGNAL(clicked(bool)), this, SLOT(onBtnSetDef()));    
 }
 
 void ControlDock::enablePanel(bool en)
@@ -228,170 +213,68 @@ void ControlDock::onBtnTest()
     onRecvData(testString);
 }
 
-void ControlDock::sendBoarId(int id)
-{
-    sendCommand("bid " + QString::number(id));
-}
-
-void ControlDock::sendFloatVolt(double value)
-{
-    sendCommand("bid " + QString::number(value * 1000));
-}
-
-void ControlDock::sendBoostVolt(double value)
-{
-    sendCommand("bvolt " + QString::number(value * 1000));
-}
-
-void ControlDock::sendBoostCurr(double value)
-{
-    sendCommand("bcurr " + QString::number(value * 1000));
-}
-
-void ControlDock::sendBoostTime(double value)
-{
-    sendCommand("btime " + QString::number(value));
-}
-
-void ControlDock::sendVusb(bool log)
-{
-    QString cont = log == true ? "on" : "off";
-    sendCommand("vusb " + cont);
-}
-
-void ControlDock::sendLog(bool value)
-{
-    QString cont = value == true ? "on" : "off";
-    sendCommand("log " + cont);
-}
-
-
 void ControlDock::sendAllParam(int id, double fvolt,
                                double bvolt, double bcurr,
-                               double btime, bool vusb)
+                               double btime, bool vusb,
+                               bool charg, bool log)
 {
-    QString cont = vusb == true ? "on" : "off";
-    sendCommand("bid " + QString::number(id) +
-                " fvolt " + QString::number(fvolt) +
-                " bvolt " + QString::number(bvolt) +
-                " bcurr " + QString::number(bcurr) +
-                " btime " + QString::number(btime) +
-                " vusb " + cont);
+    std::string vusbstr = vusb == true ? "on" : "off";
+    std::string chargstr = charg == true ? "on" : "off";
+    std::string logstr = log == true ? "on" : "off";
+
+    sendCommand("config " + QString::number(id).toStdString() +
+                " " + QString::number(fvolt * 1000).toStdString() +
+                " " + QString::number(bvolt * 1000).toStdString() +
+                " " + QString::number(bcurr * 1000).toStdString() +
+                " " + QString::number(btime).toStdString() +
+                " " + vusbstr +
+                " " + chargstr +
+                " " + logstr);
 }
 
-void ControlDock::sendCommand(const QString &cmd)
+void ControlDock::sendCommand(const std::string &cmd)
 {
-    QString command = cmd + "\n";
+    std::string command = cmd + "\r\n";
     emit sigSendData(command);
 }
 
-void ControlDock::onBtnSetId()
-{
-    app::appsetting setting = app::config::instance()->get_app_setting();
-    int id = spinBoardID->text().toInt();
-    if(setting.batt.id != id) {
-        setting.batt.id = id;
-        app::config::instance()->save_config_all(setting);
-        qDebug() << "save new board id = " << id;
-    }
-    sendBoarId(id);
-
-}
-
-void ControlDock::onBtnSetFloatVolt()
-{
-    app::appsetting setting = app::config::instance()->get_app_setting();
-    double val = spinFloatVolt->text().toDouble();
-    if(setting.batt.floatVolt != val) {
-        setting.batt.floatVolt = val;
-        app::config::instance()->save_config_all(setting);
-        qDebug() << "save new float volt = " << val;
-    }
-    sendFloatVolt(val);
-
-}
-
-void ControlDock::onBtnSetBoostVolt()
-{
-    app::appsetting setting = app::config::instance()->get_app_setting();
-    double val = spinBoostVolt->text().toDouble();
-    if(setting.batt.boostVolt != val) {
-        setting.batt.boostVolt = val;
-        app::config::instance()->save_config_all(setting);
-        qDebug() << "save new boost volt = " << val;
-    }
-    sendBoostVolt(val);
-}
-
-void ControlDock::onBtnSetBoostCurr()
-{
-    app::appsetting setting = app::config::instance()->get_app_setting();
-    double val = spinBoostCurrent->text().toDouble();
-    if(setting.batt.boostCurr != val) {
-        setting.batt.boostCurr = val;
-        app::config::instance()->save_config_all(setting);
-        qDebug() << "save new boost curr = " << val;
-    }
-    sendBoostCurr(val);
-
-}
-
-void ControlDock::onBtnSetBoostTime()
-{
-    app::appsetting setting = app::config::instance()->get_app_setting();
-    double val = spinBoostTime->text().toDouble();
-    if(setting.batt.boostTime != val) {
-        setting.batt.boostTime = val;
-        app::config::instance()->save_config_all(setting);
-        qDebug() << "save new boost time = " << val;
-    }
-    sendBoostTime(val);
-}
-
-void ControlDock::onBtnSetVusb()
-{
-    app::appsetting setting = app::config::instance()->get_app_setting();
-    bool val = checkVusb->isChecked() ? true : false;
-    if(setting.batt.vUsb != val) {
-        setting.batt.vUsb = val;
-        app::config::instance()->save_config_all(setting);
-        qDebug() << "save new vusb ctrl = " << val;
-    }
-    sendVusb(val);
-}
-
-void ControlDock::onBtnEnableLog()
-{
-    app::appsetting setting = app::config::instance()->get_app_setting();
-    bool val = checkEnableLog->isChecked() ? true : false;
-    if(setting.batt.dataLog != val) {
-        setting.batt.dataLog = val;
-        app::config::instance()->save_config_all(setting);
-        qDebug() << "save new data log = " << val;
-    }
-    sendLog(val);
-}
 
 void ControlDock::onBtnSetAll()
 {
-    app::appsetting setting = app::config::instance()->get_app_setting();
 
-    setting.batt.id = spinBoardID->text().toInt();
-    setting.batt.floatVolt = spinFloatVolt->text().toDouble();
-    setting.batt.boostVolt = spinBoostVolt->text().toDouble();
-    setting.batt.boostCurr = spinBoostCurrent->text().toDouble();
-    setting.batt.boostTime = spinBoostTime->text().toDouble();
-    setting.batt.vUsb = checkVusb->isChecked() ? true : false;
 
-    app::config::instance()->save_config_all(setting);
+    bool ok;
+    QString text = QInputDialog::getText(this, "Admin access",
+                             "Issue password:", QLineEdit::Password,
+                             "", &ok, Qt::MSWindowsFixedSizeDialogHint);
+    if (ok) {
+        if(text == "1") {
+        app::appsetting setting = app::config::instance()->get_app_setting();
+        setting.batt.id = spinBoardID->text().toInt();
+        setting.batt.floatVolt = spinFloatVolt->text().toDouble();
+        setting.batt.boostVolt = spinBoostVolt->text().toDouble();
+        setting.batt.boostCurr = spinBoostCurrent->text().toDouble();
+        setting.batt.boostTime = spinBoostTime->text().toDouble();
+        setting.batt.vUsb = checkVusb->isChecked();
+        setting.batt.dataLog = checkEnableLog->isChecked();
+        setting.batt.charg = checkCharg->isChecked();
 
-    // send parameter to board now
-    sendAllParam(setting.batt.id,
-                 setting.batt.floatVolt,
-                 setting.batt.boostVolt,
-                 setting.batt.boostCurr,
-                 setting.batt.boostTime,
-                 setting.batt.vUsb);
+        app::config::instance()->save_config_all(setting);
+
+        // send parameter to board now
+        sendAllParam(setting.batt.id,
+                     setting.batt.floatVolt,
+                     setting.batt.boostVolt,
+                     setting.batt.boostCurr,
+                     setting.batt.boostTime,
+                     setting.batt.vUsb,
+                     setting.batt.charg,
+                     setting.batt.dataLog);
+
+        } else {
+            QMessageBox::warning(this, "Wrong", "The password is incorrect !");
+        }
+    }
 }
 
 void ControlDock::onBtnGetAll()
@@ -401,22 +284,20 @@ void ControlDock::onBtnGetAll()
 
 void ControlDock::onBtnSetDef()
 {
-    app::appsetting setting = app::config::instance()->get_app_setting();
+    app::appsetting setting = app::config::instance()->get_app_setting();    
     setting.batt = setting.battdef;
+    setting.batt.conf_name = "batt_charg";
     spinBoardID->setValue(setting.batt.id);
     spinFloatVolt->setValue(setting.batt.floatVolt);
     spinBoostVolt->setValue(setting.batt.boostVolt);
     spinBoostCurrent->setValue(setting.batt.boostCurr);
-    spinBoostTime->setValue(setting.batt.floatVolt);
+    spinBoostTime->setValue(setting.batt.boostTime);
     checkVusb->setChecked(setting.batt.vUsb);
+    checkCharg->setChecked(setting.batt.charg);
+    checkEnableLog->setChecked(setting.batt.dataLog);
 
-    setting.batt.id = spinBoardID->text().toInt();
-    setting.batt.floatVolt = spinFloatVolt->text().toDouble();
-    setting.batt.boostVolt = spinBoostVolt->text().toDouble();
-    setting.batt.boostCurr = spinBoostCurrent->text().toDouble();
-    setting.batt.boostTime = spinBoostTime->text().toDouble();
-    setting.batt.vUsb = checkVusb->isChecked() ? true : false;
     app::config::instance()->save_config_all(setting);
+    qDebug() << "generate default config\r\n";
 }
 
 void ControlDock::onRecvData(const QString &str)
@@ -426,33 +307,20 @@ void ControlDock::onRecvData(const QString &str)
     controlString += str;
     if(str.contains("\n") || str.contains("\r")) {
         QString string = controlString;
-        qDebug() << "control string" << controlString;
+        //qDebug() << "control string" << controlString;
         controlString = "";
 
-        if(string.contains("invalid value")) {
-            QMessageBox::warning(this, "Wrong", string);
-        }  else if(string.contains("invalid password")) {
-            QMessageBox::warning(this, "Wrong",
-                                 "The password is incorrect !");
-        } else if(string.contains("command success")) {
-            emit showStatusBar("command success");
-        } else if(string.contains("pass")) {
-            bool ok;
-            QString text = QInputDialog::getText(this, "Admin access",
-                                     "Issue password:", QLineEdit::Password,
-                                     "", &ok, Qt::MSWindowsFixedSizeDialogHint);
-            if (ok && !text.isEmpty()) {
-                //sendCommand(text);
-                emit sigSendData(text + "\n");
-            }
+        if(string.contains("command success")) {
+            QMessageBox::information(this, "Information",
+                                 "Command successful !");
+
         } else if(string.contains("status")) {
             QString cont = string;
             QString contdisp, substring;
             QStringList list;
             double pi, pv;
-            cont.remove("\r"); cont.remove("\n"); cont.remove("status: ");
-            cont.remove("mA");cont.remove("mV"); cont.remove("mW");
-            cont.remove("*");
+            cont.remove("\r"); cont.remove("\n"); cont.remove("status: ");            
+            cont.remove("mA ");cont.remove("mV "); cont.remove("mW ");
             list = cont.split(" ");
             int i = 0;
             for(auto var : list) {
@@ -507,7 +375,7 @@ void ControlDock::onRecvData(const QString &str)
                 }
                 i++;
             }
-        } else if(string.contains("show config")) {
+        } else if(string.contains("config")) {
             QString cont = string;
             QString substring;
             QStringList list;
@@ -521,7 +389,8 @@ void ControlDock::onRecvData(const QString &str)
                     substring = list.at(i+1);
                     spinBoardID->setValue(substring.toInt());
                 } else if(var == "charg:" && (list.size() >= i + 1)) {
-
+                    substring = list.at(i+1);
+                    checkCharg->setChecked(substring == "on" ? true : false);
                 } else if(var == "fvolt:" && (list.size() >= i + 1)) {
                     substring = list.at(i+1);
                     spinFloatVolt->setValue(substring.toDouble() / 1000);
@@ -530,7 +399,7 @@ void ControlDock::onRecvData(const QString &str)
                     spinBoostVolt->setValue(substring.toDouble() / 1000);
                 } else if(var == "btime:" && (list.size() >= i + 1)) {
                     substring = list.at(i+1);
-                    spinBoostTime->setValue(substring.toDouble() / 1000);
+                    spinBoostTime->setValue(substring.toDouble());
                 }  else if(var == "bcurr:" && (list.size() >= i + 1)) {
                     substring = list.at(i+1);
                     spinBoostCurrent->setValue(substring.toDouble() / 1000);
@@ -540,6 +409,8 @@ void ControlDock::onRecvData(const QString &str)
                 }
                 i++;
             }
+
+            showStatusBar("Get configuration success");
         }
 
         pos = str.lastIndexOf("\r");

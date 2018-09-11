@@ -67,6 +67,22 @@ void config::print_config_serial(const serialport &port)
                 "stop bits: " << port.stopbits;
 }
 
+
+void config::print_config_batt(const battcharg &batt)
+{
+    qDebug() << "config name: " << batt.conf_name <<
+                "id: " << batt.id <<
+                "float volt: " << batt.floatVolt <<
+                "boost volt: " << batt.boostVolt <<
+                "boost curr: " << batt.boostVolt <<
+                "boost time: " << batt.boostTime <<
+                "vusb: " << batt.vUsb <<
+                "charg: " << batt.charg <<
+                "log: " << batt.dataLog;
+
+}
+
+
 void config::load_battcharg_cfg(battcharg &setting, battcharg def)
 {
     handle_->beginGroup(setting.conf_name);
@@ -76,6 +92,8 @@ void config::load_battcharg_cfg(battcharg &setting, battcharg def)
     setting.boostCurr   = load_key_value("boostcurr", def.boostCurr).toDouble();
     setting.boostTime   = load_key_value("boosttime", def.boostTime).toDouble();
     setting.vUsb        = load_key_value("vusb", def.vUsb).toBool();
+    setting.dataLog     = load_key_value("datalog", def.dataLog).toBool();
+    setting.charg       = load_key_value("charg", def.charg).toBool();
     handle_->endGroup();
 }
 
@@ -90,6 +108,8 @@ void config::save_battcharg_cfg(battcharg &setting)
     set_key_value("boostcurr",  setting.boostCurr);
     set_key_value("boosttime",  setting.boostTime);
     set_key_value("vusb",       setting.vUsb);
+    set_key_value("datalog",    setting.dataLog);
+    set_key_value("charg",      setting.charg);
     handle_->endGroup();
 }
 
@@ -101,7 +121,7 @@ void config::load_config_all()
     load_config_serial(setting_.stream);
     setting_.program.conf_name = "program_port";
     load_config_serial(setting_.program);
-    setting_.batt.conf_name = "batt_charg_def";
+
     battcharg def;
     def.id = 1;
     def.floatVolt = 13.8;
@@ -109,9 +129,12 @@ void config::load_config_all()
     def.boostCurr = 5;
     def.boostTime = 120;
     def.vUsb = true;
-    load_battcharg_cfg(setting_.battdef, def);
+    def.charg = true;
+    def.dataLog = true;
     setting_.batt.conf_name = "batt_charg";
     load_battcharg_cfg(setting_.batt, def);
+    setting_.battdef.conf_name = "batt_charg_def";
+    load_battcharg_cfg(setting_.battdef, def);
     setting_.display = load_key_value("display", "ascii").toString();
     setting_.protocol = load_key_value("protocol", "raw").toString();
     setting_.palette = load_key_value("palette", "dark").toString();

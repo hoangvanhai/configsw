@@ -29,6 +29,7 @@ struct battcharg{
     double   boostTime;
     bool     vUsb;
     bool     dataLog;
+    bool     charg;
 };
 
 struct appsetting {
@@ -58,6 +59,7 @@ public:
     void save_config_serial(const serialport &port);
 
     void print_config_serial(const serialport &port);
+    void print_config_batt(const battcharg &batt);
 
     void load_battcharg_cfg(battcharg &setting, battcharg def);
     void save_battcharg_cfg(battcharg &setting);

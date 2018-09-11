@@ -73,12 +73,6 @@ void Develop::createLayout()
         btnCloseConnection->setEnabled(false);
         hLayout->addWidget(btnCloseConnection);
 
-//        btnShowControlPanel->setIcon(QIcon(":/icon/setup.png"));
-//        btnShowControlPanel->setFixedSize(50, 50);
-//        btnShowControlPanel->setIconSize(QSize(35,35));
-//        btnShowControlPanel->setToolTip("show charger control");
-//        hLayout->addWidget(btnShowControlPanel);
-
         toolBar->addWidget(groupBox);
         toolBar->addSeparator();
     }
@@ -117,9 +111,9 @@ void Develop::createConnection()
     connect(btnShowControlPanel, SIGNAL(clicked(bool)), this, SLOT(showControlPanel()));
 
     connect(this, SIGNAL(signalConnectionEvent(int)), this, SLOT(recvConnectionEvent(int)));
-    //connect(this, SIGNAL(signalChargerData(uint8_t*,int)), this, SLOT(recvChargerDataEvent(uint8_t*,int)));
+    connect(this, SIGNAL(signalChargerData(QString)), this, SLOT(recvChargerDataEvent(QString)));
     connect(this, SIGNAL(signalChargerData(QString)), control, SLOT(onRecvData(QString)));
-    connect(control, SIGNAL(sigSendData(QString)), this, SLOT(onSendData(QString)));
+    connect(control, SIGNAL(sigSendData(std::string)), this, SLOT(onSendData(std::string)));
     connect(control, SIGNAL(showStatusBar(QString)), this, SLOT(onShowStatusMsg(QString)));
     connect(this, SIGNAL(signalEnablePanel(bool)), control, SLOT(enablePanel(bool)));
 
@@ -158,8 +152,7 @@ void Develop::openConnection()
                                               int frame_len_) {
                 (void)frame_len_;
                 QString msg = QString((const char*)frame_);
-                qDebug() << "raw " << msg;
-                //msg.remove("\r"); msg.remove("\n");
+                //qDebug() << "raw " << msg;
                 emit signalChargerData(msg);
             });
         }
@@ -234,20 +227,11 @@ void Develop::readData()
     qDebug() << "read " << data;
 }
 
-void Develop::onSendData(QString data)
+void Develop::onSendData(const std::string &data)
 {
     if(ibc_obj_->get_status() == communication::Status_Connected) {
-
-        uint8_t *sendData = new uint8_t[data.length()];
-        uint8_t *pData = (uint8_t*)data.toStdString().c_str();
-        for(int i = 0; i < data.toStdString().length(); i++) {
-            sendData[i] = pData[i];
-        }
-        int err = ibc_obj_->send_raw_data(sendData, data.length());
-        qDebug() << "control send data: " << data << " len " << err;
-
-        delete[] sendData;
-
+        int err = ibc_obj_->send_raw_data(data.data(), data.length());
+        //std::cout << "control send data: " << data << " len " << err;
     } else {
         QMessageBox::warning(this, "Connection error",
                              "Connection not open, open and try again !");
@@ -255,8 +239,43 @@ void Develop::onSendData(QString data)
 }
 
 void Develop::recvChargerDataEvent(const QString &string)
-{
-    (void)string;
+{    
+
+    if(string.contains("atus")) {
+        QString cont = string;
+        QString substring;
+        QStringList list;
+        double bv, bi;
+        cont.remove("\r"); cont.remove("\n");
+        cont.remove("mA ");cont.remove("mV "); cont.remove("mW ");
+        list = cont.split(" ");
+        int i = 0;
+        for(auto var : list) {
+
+            if(var == "PV:" && (list.size() >= i + 1)) {
+                substring = list.at(i+1);
+
+            } else if(var == "PI:" && (list.size() >= i + 1)) {
+                substring = list.at(i+1);
+
+            } else if(var == "PP:" && (list.size() >= i + 1)) {
+                substring = list.at(i+1);
+
+            } else if(var == "BV:" && (list.size() >= i + 1)) {
+                substring = list.at(i+1);
+                bv = substring.toDouble() / 1000;
+                qDebug() << "BV = " << bv;
+            } else if(var == "BI:" && (list.size() >= i + 1)) {
+                substring = list.at(i+1);
+                bi = substring.toDouble() / 1000;
+                qDebug() << "BI = " << bi;
+            } else if(var == "BC:" && (list.size() >= i + 1)) {
+                substring = list.at(i+1);
+
+            }
+            i++;
+        }
+    }
 }
 
 
