@@ -102,7 +102,8 @@ SOURCES += main.cpp\
     ui/setting/serialport.cpp \
     ui/setting/hardware.cpp \
     ui/setting/permission.cpp \
-    ui/controldock.cpp
+    ui/controldock.cpp \
+    ui/chargeditor.cpp
 
 HEADERS  += ui/mainwindow.h \
     ui/develop.h \
@@ -175,7 +176,8 @@ HEADERS  += ui/mainwindow.h \
     ui/setting/serialport.h \
     ui/setting/hardware.h \
     ui/setting/permission.h \
-    ui/controldock.h
+    ui/controldock.h \
+    ui/chargeditor.h
 
 RESOURCES += resource.qrc
 

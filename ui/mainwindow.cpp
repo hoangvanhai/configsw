@@ -28,6 +28,7 @@ void MainWindow::createElement()
     tabWidget = new QTabWidget(this);
     setting = new Setting(this);
     develop = new Develop(this);    
+    editor = new ChargEditor(this);
     centerWidget = new QWidget;
     mainLayout = new QVBoxLayout;
     comTheme = new QComboBox(this);
@@ -79,7 +80,8 @@ void MainWindow::createLayout()
 
     tabWidget->addTab(setting, tr("SETTING"));
     tabWidget->addTab(develop, tr("CHARGER"));
-    tabWidget->setCurrentWidget(develop);
+    tabWidget->addTab(editor, tr("EDITOR"));
+    tabWidget->setCurrentWidget(editor);
 
     QString wgstyle = QString( "QTabBar::tab { height: 35px; width: 180 px;}" );
     tabWidget->setStyleSheet( wgstyle );

@@ -6,6 +6,7 @@
 #include <QtWidgets>
 #include <develop.h>
 #include <setting.h>
+#include <chargeditor.h>
 
 
 class MainWindow : public QMainWindow
@@ -34,6 +35,7 @@ private:
 
     Setting     *setting;
     Develop     *develop;    
+    ChargEditor *editor;
 
     QComboBox   *comTheme;
 
