@@ -41,6 +41,7 @@ struct appsetting {
     QString display;
     QString protocol;
     QString palette;
+    QString filePath;
 };
 
 

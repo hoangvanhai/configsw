@@ -31,7 +31,8 @@ INCLUDEPATH +=  $$PWD \
                 $$PWD/cpp_lib/communication/socket \
                 $$PWD/cpp_lib/communication/dll \
                 $$PWD/cpp_lib/pattern \
-                $$PWD/cpp_lib/string
+                $$PWD/cpp_lib/string   \
+                $$PWD/cpp_lib/csv
 
 win32 {
     DEFINES += WIN32_LEAN_AND_MEAN  # exclude some APIs Cryptography, DDE, RPC, Shell ...
@@ -59,6 +60,7 @@ SOURCES += main.cpp\
     ibc/framing/layer2.cpp \
     ibc/lib/fifo.cpp \
     ibc/lib/crc8.c \
+    cpp_lib/csv/csvfile.cpp \
     cpp_lib/communication/socket/serialport/SerialPort_Linux.cpp \
     cpp_lib/communication/socket/serialport/SerialPort_Win.cpp \
     cpp_lib/communication/socket/serialport/SerialSocket.cpp \
@@ -177,7 +179,8 @@ HEADERS  += ui/mainwindow.h \
     ui/setting/hardware.h \
     ui/setting/permission.h \
     ui/controldock.h \
-    ui/chargeditor.h
+    ui/chargeditor.h \
+    cpp_lib/csv/csvfile.h
 
 RESOURCES += resource.qrc
 

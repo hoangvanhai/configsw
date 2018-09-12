@@ -1,7 +1,7 @@
 #include "config.h"
 #include <iostream>
 #include <QDebug>
-
+#include <QDir>
 
 namespace app {
 config::config()
@@ -138,6 +138,7 @@ void config::load_config_all()
     setting_.display = load_key_value("display", "ascii").toString();
     setting_.protocol = load_key_value("protocol", "raw").toString();
     setting_.palette = load_key_value("palette", "dark").toString();
+    setting_.filePath = load_key_value("filepath", QDir::homePath()).toString();
 }
 
 void config::save_config_all(app::appsetting setting)
@@ -150,6 +151,7 @@ void config::save_config_all(app::appsetting setting)
     set_key_value("display", setting.display);
     set_key_value("protocol", setting.protocol);
     set_key_value("palette", setting.palette);
+    set_key_value("filepath", setting.filePath);
 }
 
 QVariant config::load_key_value(const QString &key, QVariant def)
