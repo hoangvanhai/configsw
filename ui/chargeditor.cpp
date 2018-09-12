@@ -36,8 +36,8 @@ void ChargEditor::createElement()
     groupEditor = new QGroupBox("CHARACTER EDITOR", this);
     groupControl = new QGroupBox("CONTROL", this);
 
-//    btnAddPoint = new QPushButton("add point", groupControl);
-//    btnRemPoint = new QPushButton("del point", groupControl);
+    btnAddPoint = new QPushButton("add point");
+    btnRemPoint = new QPushButton("del point");
 }
 
 void ChargEditor::createLayout()
@@ -57,13 +57,11 @@ void ChargEditor::createLayout()
     vSplitter->addWidget(groupControl);
     vSplitter->addWidget(chartView);    
 
-//    for(int i = 0; i < 1; i++) {
-//        LineEditor *row = new LineEditor;
-//        layoutEditor->addWidget(row);
-//    }
-
-    //layoutEditor->addStretch(1);
     layoutEditor->setContentsMargins(0,0,0,0);
+
+//    QString wgstyle = QString("background-color: red;");
+//    scWidget->setStyleSheet(wgstyle);
+//    layoutEditor->setSizeConstraint(QLayout::SetMinimumSize);
 
     QList<int> heights;
     heights.push_back(200);
@@ -78,15 +76,10 @@ void ChargEditor::createLayout()
 
     QGridLayout *gridLayout = new QGridLayout;
     groupControl->setLayout(gridLayout);
-    QPushButton *btnAdd = new QPushButton("ADD");
-    QPushButton *btnDel = new QPushButton("DEL");
-    gridLayout->addWidget(btnAdd, 0, 1);
-    gridLayout->addWidget(btnDel, 1, 1);
+    gridLayout->addWidget(btnAddPoint, 0, 1);
+    gridLayout->addWidget(btnRemPoint, 1, 1);
 
     gridLayout->setColumnStretch(0, 1);
-
-    connect(btnAdd, SIGNAL(clicked(bool)), this, SLOT(onBtnAddPoint()));
-    connect(btnDel, SIGNAL(clicked(bool)), this, SLOT(onBtnRemPoint()));
 }
 
 void ChargEditor::createContent()
@@ -96,24 +89,38 @@ void ChargEditor::createContent()
 
 void ChargEditor::createConnection()
 {
-//    connect(btnAddPoint, SIGNAL(clicked(bool)), this, SLOT(onBtnAddPoint()));
-//    connect(btnRemPoint, SIGNAL(clicked(bool)), this, SLOT(onBtnRemPoint()));
+    connect(btnAddPoint, SIGNAL(clicked(bool)), this, SLOT(onBtnAddPoint()));
+    connect(btnRemPoint, SIGNAL(clicked(bool)), this, SLOT(onBtnRemPoint()));
 }
 
 void ChargEditor::onBtnAddPoint()
 {
     if(numLine == 0) {
-        layoutEditor->addWidget(new LineEditor(numLine, this));
+        layoutEditor->addWidget(new LineEditor(layoutEditor->count(), this));
         layoutEditor->addStretch(1);
+        numLine+=2;
     } else {
-        layoutEditor->insertWidget(numLine, new LineEditor(numLine, this));
-    }
-    numLine++;
+        qDebug() << "insert count = " << numLine;
+        layoutEditor->insertWidget(numLine - 1, new LineEditor(numLine - 1, this));
+        numLine++;
+    }    
+
+
 }
 
 void ChargEditor::onBtnRemPoint()
 {
-    qDebug() << "count = " << layoutEditor->count();
+    if(layoutEditor->count() >= 2) {
+        qDebug() << "delete at " << layoutEditor->count() - 2;
+        QWidget *widget = layoutEditor->takeAt(layoutEditor->count() - 2)->widget();
+        delete widget;
+        qDebug() << "removed count = " << layoutEditor->count();
+        numLine--;
+    } else {
+        qDebug() << "not rem count = " << layoutEditor->count() << " line " << numLine;
+
+    }
+
 
 }
 
@@ -145,8 +152,10 @@ LineEditor::LineEditor(int id, QWidget *parent) :
         hLayout->addWidget(spTimeMax);
     }
     hLayout->addStretch(1);
-    //QString wgstyle = QString("background-color: yellow;");
-    //setStyleSheet(wgstyle);
+//    QString wgstyle = QString("background-color: blue;");
+    //QString wgstyle = QString("#myWidget {background-color:red;}");
+    //setObjectName("myWidget");
+//    this->setStyleSheet(wgstyle);
 
     setLayout(hLayout);
 }

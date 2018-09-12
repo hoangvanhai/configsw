@@ -48,7 +48,6 @@ private:
     QSplitter           *vSplitter;
 
     QGroupBox           *groupEditor, *groupControl;
-
     QPushButton         *btnAddPoint, *btnRemPoint;
 
     int                 numLine;
