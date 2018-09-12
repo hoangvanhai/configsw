@@ -79,11 +79,11 @@ void MainWindow::createLayout()
 
 
     tabWidget->addTab(setting, tr("SETTING"));
-    tabWidget->addTab(develop, tr("CHARGER"));
+    tabWidget->addTab(develop, tr("MONITOR"));
     tabWidget->addTab(editor, tr("EDITOR"));
     tabWidget->setCurrentWidget(editor);
 
-    QString wgstyle = QString( "QTabBar::tab { height: 35px; width: 180 px;}" );
+    QString wgstyle = QString( "QTabBar::tab { height: 32px; width: 180 px;}" );
     tabWidget->setStyleSheet( wgstyle );
 
     mainLayout->addLayout(layout);
@@ -96,7 +96,6 @@ void MainWindow::createLayout()
 
     move(QApplication::desktop()->screen()->rect().center() - rect().center());
     //showMaximized();
-
 }
 
 

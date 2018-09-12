@@ -51,9 +51,10 @@ int CSVFile::open(bool write)
 
     } else {
         if(write) {
-            string out_file = remove_extension(m_filename) + "_OUT.csv";
+            //string out_file = remove_extension(m_filename) + "_OUT.csv";
+            string out_file = m_filename;
             stream_write.open(out_file, ios::binary);
-            stream_write << stream_read.rdbuf(); // Copy read file into output file
+            //stream_write << stream_read.rdbuf(); // Copy read file into output file
         }
     }
 

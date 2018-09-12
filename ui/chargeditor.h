@@ -46,13 +46,18 @@ public:
     void printNodeInfo(const NodeInfo &node);
 
     bool loadImportFile(const QString &file);
+
+    void writeRowToFile(const std::vector<std::string> row);
+    void closeFile();
 signals:
 
 public slots:
     void onBtnAddPoint();
     void onBtnRemPoint();
-    void onBtnExport();
+    void onBtnSelectExport();
+    void onBtnSelectImport();
     void onBtnImport();
+    void onBtnExport();
     void updateChart();
 
 private:
@@ -69,7 +74,8 @@ private:
     QPushButton         *btnAddPoint, *btnRemPoint;
 
     QPushButton         *btnConnect, *btnDisconnect, *btnBrowFileImport,
-                        *btnBrowFileExport, *btnWrite;
+                        *btnBrowFileExport, *btnImport, *btnExport;
+    QToolButton         *btnWrite;
 
     QLineEdit           *editFileImport, *editFileExport;
     QString             filePath;

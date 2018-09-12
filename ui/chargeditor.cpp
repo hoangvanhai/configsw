@@ -1,4 +1,8 @@
 #include "chargeditor.h"
+#include <cpp_lib/string/StringUtils.h>
+
+using namespace cppframework;
+
 
 ChargEditor::ChargEditor(QWidget *parent) :
     QMainWindow(parent)
@@ -14,7 +18,7 @@ void ChargEditor::initVariable()
 {
     app::appsetting setting = app::config::instance()->get_app_setting();
     numLine = 0;
-    filePath = setting.filePath;
+    filePath = setting.filePathImport;
 }
 
 void ChargEditor::createElement()
@@ -34,6 +38,7 @@ void ChargEditor::createElement()
     chartView->setRenderHint(QPainter::Antialiasing, true);
     iSeries->setName("current");
     vSeries->setName("voltage");
+    iSeries->setColor(QColor("red"));
     layoutEditor = new QVBoxLayout;
 
     hSplitter = new QSplitter(Qt::Horizontal);
@@ -48,11 +53,20 @@ void ChargEditor::createElement()
     btnConnect = new QPushButton  ("   CONNECT   ");
     btnDisconnect = new QPushButton("DISCONNECT");
 
-    btnBrowFileImport = new QPushButton("IMPORT");
-    btnBrowFileExport = new QPushButton("EXPORT");
-    btnWrite = new QPushButton("DOWNLOAD");
+    btnBrowFileImport = new QPushButton;
+    btnBrowFileImport->setIcon(QIcon(":/icon/open-folder.png"));
+    btnBrowFileExport = new QPushButton;
+    btnBrowFileExport->setIcon(QIcon(":/icon/open-folder.png"));
+
+    btnWrite = new QToolButton;
+    btnWrite->setIcon(QIcon(":/icon/download.png"));
+    btnWrite->setText("DOWNLOAD");
+
     editFileImport = new QLineEdit;
     editFileExport = new QLineEdit;
+
+    btnImport = new QPushButton("IMPORT");
+    btnExport = new QPushButton("EXPORT");
 }
 
 void ChargEditor::createLayout()
@@ -74,10 +88,6 @@ void ChargEditor::createLayout()
 
     layoutEditor->setContentsMargins(0,0,0,0);
 
-//    QString wgstyle = QString("background-color: red;");
-//    scWidget->setStyleSheet(wgstyle);
-//    layoutEditor->setSizeConstraint(QLayout::SetMinimumSize);
-
     QList<int> heights;
     heights.push_back(200);
     heights.push_back(600);
@@ -92,37 +102,51 @@ void ChargEditor::createLayout()
     QGridLayout *gridLayout = new QGridLayout;
     groupControl->setLayout(gridLayout);
 
-    gridLayout->addWidget(btnConnect, 0, 1);
-    gridLayout->addWidget(btnDisconnect, 0, 2);
-    gridLayout->addWidget(btnWrite, 0, 3);
+    gridLayout->addWidget(btnConnect, 0, 2);
+    gridLayout->addWidget(btnDisconnect, 0, 3);
 
-    gridLayout->addWidget(editFileImport, 1, 0, 1 , 2);
-    gridLayout->addWidget(btnBrowFileImport, 1, 2);
+    gridLayout->addWidget(editFileImport, 1, 0);
+    gridLayout->addWidget(btnBrowFileImport, 1, 1);
+    gridLayout->addWidget(btnImport, 1, 2);
+    gridLayout->addWidget(btnWrite, 1, 3, 2, 1);
 
-    gridLayout->addWidget(editFileExport, 2, 0, 1 , 2);
-    gridLayout->addWidget(btnBrowFileExport, 2, 2);
+    gridLayout->addWidget(editFileExport, 2, 0);
+    gridLayout->addWidget(btnBrowFileExport, 2, 1);
+    gridLayout->addWidget(btnExport, 2, 2);
 
     gridLayout->addWidget(btnRemPoint, 3, 2);
     gridLayout->addWidget(btnAddPoint, 3, 3);
 
 
+    btnWrite->setMinimumHeight(50);
+    btnWrite->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+    btnWrite->setIconSize(QSize(30, 30));
     gridLayout->setColumnStretch(0, 1);
+
+    btnConnect->setToolTip(tr("connect serial port to charger"));
+    btnDisconnect->setToolTip(tr("disconnect serial port to charger"));
+    btnRemPoint->setToolTip(tr("remove the last point on editor screen"));
+    btnAddPoint->setToolTip(tr("add to the end of editor screen"));
+    btnWrite->setToolTip(tr("download config to the board"));
 
 }
 
 void ChargEditor::createContent()
 {
     statusBar()->showMessage("Ready");
-    editFileImport->setText(filePath);
-    editFileExport->setText(filePath);
+    app::appsetting setting = app::config::instance()->get_app_setting();
+    editFileImport->setText(setting.filePathImport);
+    editFileExport->setText(setting.filePathExport);
 }
 
 void ChargEditor::createConnection()
 {
     connect(btnAddPoint, SIGNAL(clicked(bool)), this, SLOT(onBtnAddPoint()));
     connect(btnRemPoint, SIGNAL(clicked(bool)), this, SLOT(onBtnRemPoint()));
-    connect(btnBrowFileExport, SIGNAL(clicked(bool)), this, SLOT(onBtnExport()));
-    connect(btnBrowFileImport, SIGNAL(clicked(bool)), this, SLOT(onBtnImport()));
+    connect(btnBrowFileExport, SIGNAL(clicked(bool)), this, SLOT(onBtnSelectExport()));
+    connect(btnBrowFileImport, SIGNAL(clicked(bool)), this, SLOT(onBtnSelectImport()));
+    connect(btnImport, SIGNAL(clicked(bool)), this, SLOT(onBtnImport()));
+    connect(btnExport, SIGNAL(clicked(bool)), this, SLOT(onBtnExport()));
 }
 
 bool ChargEditor::exportDataToFile(const QString &file)
@@ -140,11 +164,36 @@ bool ChargEditor::exportDataToFile(const QString &file)
             listData.push_back(node);
             printNodeInfo(node);
         }
-
         (void)file;
-        return true;
-    }
 
+        loader = std::make_shared<CSVFile>(editFileExport->text().toStdString());
+        int err = loader->open(true);
+        if(err == 0) {
+
+            std::vector<std::string> row;
+            row.push_back("No");
+            row.push_back("Type");
+            row.push_back("Current");
+            row.push_back("Voltage");
+            row.push_back("Time");
+            writeRowToFile(row);
+
+            for(auto var : listData) {
+                row.clear();
+                row.push_back(QString::number(var.id).toStdString());
+                row.push_back(QString::number(var.type).toStdString());
+                row.push_back(QString::number(var.current).toStdString());
+                row.push_back(QString::number(var.voltage).toStdString());
+                row.push_back(QString::number(var.time).toStdString());
+                writeRowToFile(row);
+            }
+
+            closeFile();
+            return true;
+        } else {
+            return false;
+        }
+    }
     return false;
 }
 
@@ -161,9 +210,7 @@ void ChargEditor::updateChart()
             node.time = var->getTime();
             listData.push_back(node);
         }
-
         drawChart();
-
     }
 }
 
@@ -179,11 +226,9 @@ void ChargEditor::drawChart()
             iSeries->append(count, var.current);
             vSeries->append(count, var.voltage);
             count++;
-            //qDebug() << "#";
         }
 
     }
-    //qDebug() << "update chart ";
 }
 
 void ChargEditor::importDataFromFile(const QString &file)
@@ -206,12 +251,80 @@ bool ChargEditor::loadImportFile(const QString &file)
     int err = loader->open();
     if(err == 0) {
         if(loader->get_count()) {
-            loader->display_all();
-            //CSVFile::CsvVector data = loader->rows();
+
+            size_t size = listEditor.size();
+            for(size_t i = 0; i < size; i++) {
+                onBtnRemPoint();
+            }
+
+            listEditor.clear();
+
+            //loader->display_all();
+            CSVFile::CsvVector data = loader->rows();
+
+            CSVFile::CsvVector::const_iterator iter;
+            for(iter = data.begin();
+                iter != data.end(); ++iter) {
+                std::vector<std::string> row = *iter;
+                if(row.size() >= 5) {
+                    if(numLine == 0) {
+                        LineEditor *line = new LineEditor(layoutEditor->count(), this);
+                        line->setType(str::Util::convert<int>(row.at(1), 0));
+                        line->setCurrent(str::Util::convert<double>(row.at(2), 0));
+                        line->setVoltage(str::Util::convert<double>(row.at(3), 0));
+                        line->setTime(str::Util::convert<double>(row.at(4), 0));
+                        layoutEditor->addWidget(line);
+                        layoutEditor->addStretch(1);
+                        //connect(line, SIGNAL(changedValue()), this, SLOT(updateChart()));
+                        listEditor.push_back(line);
+                        numLine+=2;
+                    } else if (numLine < 22) {
+                        LineEditor *line = new LineEditor(numLine - 1, this);
+                        line->setType(str::Util::convert<int>(row.at(1), 0));
+                        line->setCurrent(str::Util::convert<double>(row.at(2), 0));
+                        line->setVoltage(str::Util::convert<double>(row.at(3), 0));
+                        line->setTime(str::Util::convert<double>(row.at(4), 0));
+                        qDebug() << "insert count = " << numLine;
+                        layoutEditor->insertWidget(numLine - 1, line);
+                        //connect(line, SIGNAL(changedValue()), this, SLOT(updateChart()));
+                        listEditor.insert(listEditor.size(), line);
+                        numLine++;
+                    } else {
+                        qDebug() << "max line added";
+                    }
+                    updateChart();
+                }
+            }
+
+
+            for(auto &var : listEditor) {
+                connect(var, SIGNAL(changedValue()), this, SLOT(updateChart()));
+            }
+
+            return true;
+        } else {
+            return true;
         }
-        return true;
     } else {
         return false;
+    }
+}
+
+void ChargEditor::writeRowToFile(const std::vector<std::string> row)
+{
+    if(loader) {
+         if(loader->is_open()) {
+             loader->write_row(row);
+             //qDebug() << "write row";
+         }
+    }
+}
+
+void ChargEditor::closeFile()
+{
+    if(loader != nullptr) {
+        loader->close();
+        loader.reset();
     }
 }
 
@@ -232,15 +345,9 @@ void ChargEditor::onBtnAddPoint()
         listEditor.insert(listEditor.size(), line);
         numLine++;
     } else {
-        qDebug() << "max line added";
+        //qDebug() << "max line added";
     }
-
-
     updateChart();
-
-//    for(auto var : listEditor) {
-//        qDebug() << "id: " << var->getId();
-//    }
 }
 
 void ChargEditor::onBtnRemPoint()
@@ -249,23 +356,26 @@ void ChargEditor::onBtnRemPoint()
         qDebug() << "delete at " << layoutEditor->count() - 2;
         QWidget *widget = layoutEditor->takeAt(layoutEditor->count() - 2)->widget();        
         delete widget;
-        qDebug() << "removed count = " << layoutEditor->count();
+        //qDebug() << "removed count = " << layoutEditor->count();
         numLine--;
         listEditor.removeLast();
+        updateChart();
     } else {
-        qDebug() << "not rem count = " << layoutEditor->count() << " line " << numLine;
+       // qDebug() << "not rem count = " << layoutEditor->count() << " line " << numLine;
     }
 }
 
-void ChargEditor::onBtnExport()
+void ChargEditor::onBtnSelectExport()
 {
-    //if(listEditor.size() > 0)
     {
         QString fileName = QFileDialog::getSaveFileName(this,
              tr("Select file to export"), filePath == "" ? QDir::homePath() : filePath, tr("CSV file (*.csv)"));
 
         if(fileName != "") {
             filePath = QDir::cleanPath(fileName);
+            app::appsetting setting = app::config::instance()->get_app_setting();
+            setting.filePathExport = filePath;
+            app::config::instance()->save_config_all(setting);
             editFileExport->setText(fileName);
 
             if(exportDataToFile(fileName)) {
@@ -277,13 +387,9 @@ void ChargEditor::onBtnExport()
             }
         }
     }
-//    else {
-//        QMessageBox::warning(this, "Warning",
-//                             "no data, make data and try again !");
-//    }
 }
 
-void ChargEditor::onBtnImport()
+void ChargEditor::onBtnSelectImport()
 {
 
     QString fileName = QFileDialog::getOpenFileName(this,
@@ -292,17 +398,44 @@ void ChargEditor::onBtnImport()
     if(fileName != "") {
         filePath = QDir::cleanPath(fileName);
         app::appsetting setting = app::config::instance()->get_app_setting();
-        setting.filePath = filePath;
+        setting.filePathImport = filePath;
         app::config::instance()->save_config_all(setting);
         editFileImport->setText(fileName);
 
         if(loadImportFile(fileName)) {
             QMessageBox::information(this, "Information",
-                                 "export successful !");
+                                     "import successful !");
         } else {
             QMessageBox::warning(this, "Warning",
-                                 "export failed, no data !");
+                                 "import failed, no data !");
         }
+    }
+
+}
+
+void ChargEditor::onBtnImport()
+{
+    if(editFileImport->text() != "") {
+        if(loadImportFile(editFileImport->text())) {
+            QMessageBox::information(this, "Information",
+                                     "import successful !");
+        }
+    } else {
+        QMessageBox::warning(this, "Warning",
+                             "Please select file before import !");
+    }
+}
+
+void ChargEditor::onBtnExport()
+{
+    if(editFileExport->text() != "") {
+        if(exportDataToFile(editFileExport->text())) {
+            QMessageBox::information(this, "Information",
+                                     "export successful !");
+        }
+    } else {
+        QMessageBox::warning(this, "Warning",
+                             "Please select file before export !");
     }
 
 }
@@ -323,6 +456,7 @@ LineEditor::LineEditor(int id, QWidget *parent) :
         comType->addItem("Fi(t)");
         comType->addItem("idle");
         QSpinBox *rowId = new QSpinBox;
+        rowId->setReadOnly(true);
         rowId->setValue(id);
         hLayout->addWidget(rowId);
         hLayout->addWidget(new QLabel(tr("Type:")));
@@ -339,11 +473,6 @@ LineEditor::LineEditor(int id, QWidget *parent) :
         connect(spTimeMax, SIGNAL(valueChanged(double)), this, SLOT(onChangedValue()));
     }
     hLayout->addStretch(1);
-//    QString wgstyle = QString("background-color: blue;");
-    //QString wgstyle = QString("#myWidget {background-color:red;}");
-    //setObjectName("myWidget");
-//    this->setStyleSheet(wgstyle);
-
     setLayout(hLayout);
 }
 
@@ -400,5 +529,4 @@ double LineEditor::getTime() const
 void LineEditor::onChangedValue()
 {
     emit changedValue();
-    qDebug() << "value changed ";
 }
