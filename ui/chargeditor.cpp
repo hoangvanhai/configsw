@@ -16,6 +16,7 @@ ChargEditor::ChargEditor(QWidget *parent) :
 
 void ChargEditor::initVariable()
 {
+    ibc_obj_ = std::make_shared<ibc::layer2>();
     app::appsetting setting = app::config::instance()->get_app_setting();
     numLine = 0;
     filePath = setting.filePathImport;
@@ -49,7 +50,7 @@ void ChargEditor::createElement()
     groupControl = new QGroupBox("CONTROL", this);
 
     btnAddPoint = new QPushButton("ADD POINT");
-    btnRemPoint = new QPushButton("DEL POINT");
+    btnRemPoint = new QPushButton("REM POINT");
 
     btnConnect = new QPushButton  ("   CONNECT   ");
     btnDisconnect = new QPushButton("DISCONNECT");
@@ -68,6 +69,8 @@ void ChargEditor::createElement()
 
     btnImport = new QPushButton("IMPORT");
     btnExport = new QPushButton("EXPORT");
+    btnImport->setToolTip(tr("import data from file"));
+    btnExport->setToolTip(tr("export data to file"));
 }
 
 void ChargEditor::createLayout()
@@ -87,7 +90,7 @@ void ChargEditor::createLayout()
     vSplitter->addWidget(groupControl);
     vSplitter->addWidget(chartView);    
 
-    layoutEditor->setContentsMargins(0,0,0,0);
+    //layoutEditor->setContentsMargins(0,0,0,0);
 
     QList<int> heights;
     heights.push_back(200);
@@ -130,6 +133,7 @@ void ChargEditor::createLayout()
     btnAddPoint->setToolTip(tr("add to the end of editor screen"));
     btnWrite->setToolTip(tr("download config to the board"));
 
+    onEnablePanel(false);
 }
 
 void ChargEditor::createContent()
@@ -148,6 +152,10 @@ void ChargEditor::createConnection()
     connect(btnBrowFileImport, SIGNAL(clicked(bool)), this, SLOT(onBtnSelectImport()));
     connect(btnImport, SIGNAL(clicked(bool)), this, SLOT(onBtnImport()));
     connect(btnExport, SIGNAL(clicked(bool)), this, SLOT(onBtnExport()));
+    connect(btnConnect, SIGNAL(clicked(bool)), this, SLOT(onBtnOpenConnection()));
+    connect(btnDisconnect, SIGNAL(clicked(bool)), this, SLOT(onBtnCloseConnection()));
+    connect(this, SIGNAL(signalConnectionEvent(int)), this, SLOT(recvConnectionEvent(int)));
+    connect(this, SIGNAL(signalChargerData(QString)), this, SLOT(recvChargerDataEvent(QString)));
 }
 
 bool ChargEditor::loadExportData(const QString &file)
@@ -212,6 +220,24 @@ void ChargEditor::updateChart()
             listData.push_back(node);
         }
         drawChart();
+    }
+}
+
+void ChargEditor::setCommunication(std::shared_ptr<ibc::layer2> conn)
+{
+    ibc_obj_ = conn;
+}
+
+void ChargEditor::sendData(const std::string &cmd)
+{
+    if(ibc_obj_->get_status() == communication::Status_Connected) {
+        int err = ibc_obj_->send_raw_data(data.data(), data.length());
+        (void)err;
+        //std::cout << "control send data: " << data << " len " << err;
+        fflush(stdout);
+    } else {
+        QMessageBox::warning(this, "Connection error",
+                             "Connection not open, open and try again !");
     }
 }
 
@@ -445,6 +471,117 @@ void ChargEditor::onBtnExport()
 
 
 
+void ChargEditor::onBtnOpenConnection()
+{
+
+    app::appsetting setting = app::config::instance()->get_app_setting();
+    std::cout << "open control \n"; fflush(stdout);
+
+    if(ibc_obj_) {
+        ibc_obj_->set_notify_event([&](communication::Status status) {
+            emit signalConnectionEvent(status);
+        });
+
+        ibc_obj_->set_ack(false);
+        bool proto = setting.protocol == "isc" ? true : false;
+        ibc_obj_->set_protocol(proto);
+
+
+        if(proto) {
+            std::cout << "set control protocol\n";
+            ibc_obj_->set_callback_frame_recv([&](uint8_t *frame_,
+                                                int frame_len_) {
+                (void)frame_len_;
+                //std::cout << "recv control protocol: " << frame_len_ << std::endl;
+                QString msg = QString((const QChar*)(frame_ + IDX_FRM_DATA0), frame_[IDX_FRM_DLEN]);
+                emit signalChargerData(msg);
+            });
+        } else {
+            std::cout << "set control raw\n";
+            ibc_obj_->set_callback_recv_raw([&](const void *frame_,
+                                              int frame_len_) {
+                (void)frame_len_;
+                QString msg = QString((const char*)frame_);
+                qDebug() << "raw " << msg;
+                emit signalChargerData(msg);
+            });
+        }
+
+
+
+        std::cout << " port name " << setting.control.port_name.toStdString() << std::endl;
+        fflush(stdout);
+        int ret = ibc_obj_->start(setting.control.port_name.toStdString(),
+                           setting.control.baudrate,
+                           setting.control.databits,
+                           setting.control.paritybits,
+                           setting.control.stopbits);
+
+        std::cout << "ret " << ret << std::endl; fflush(stdout);
+    }
+
+}
+
+void ChargEditor::recvConnectionEvent(int event)
+{
+    switch(event ){
+    case communication::Status_Connected:
+        btnConnect->setEnabled(false);
+        btnDisconnect->setEnabled(true);
+        statusBar()->setStyleSheet("QStatusBar { color: green;}");
+        statusBar()->showMessage("control port connected to " +
+                                 app::config::instance()->get_app_setting().control.port_name);
+        onEnablePanel(true);
+        break;
+    case communication::Status_Disconnected:
+        btnConnect->setEnabled(true);
+        btnDisconnect->setEnabled(false);
+        if(ibc_obj_->is_start()) {
+            statusBar()->setStyleSheet("QStatusBar { color: red;}");
+            statusBar()->showMessage(tr("Can not open control on %1 check port in system ").
+                                     arg(app::config::instance()->get_app_setting().control.port_name));
+        } else {
+            statusBar()->showMessage(tr("control port is closed"));
+        }
+        onEnablePanel(false);
+        break;
+    case communication::Status_Device_Disconnected:
+        btnConnect->setEnabled(true);
+        btnDisconnect->setEnabled(false);
+        ibc_obj_->stop();
+        statusBar()->setStyleSheet("QStatusBar { color: red;}");
+        statusBar()->showMessage("Lost connection with " +
+                                 app::config::instance()->get_app_setting().control.port_name +
+                                 " stop control");
+        onEnablePanel(false);
+        break;
+    default:
+        std::cout << "def state\n";
+        break;
+    }
+}
+
+
+void ChargEditor::recvChargerDataEvent(const QString &str)
+{
+
+
+}
+
+void ChargEditor::onEnablePanel(bool en)
+{
+    btnWrite->setEnabled(en);
+    btnDisconnect->setEnabled(en);
+}
+
+
+void ChargEditor::onBtnCloseConnection()
+{
+    if(ibc_obj_) {
+        ibc_obj_->stop();
+    }
+}
+
 LineEditor::LineEditor(int id, QWidget *parent) :
     QWidget(parent), id_(id)
 {    
@@ -475,6 +612,7 @@ LineEditor::LineEditor(int id, QWidget *parent) :
         connect(spCurrent, SIGNAL(valueChanged(double)), this, SLOT(onChangedValue()));
         connect(spVoltage, SIGNAL(valueChanged(double)), this, SLOT(onChangedValue()));
         connect(spTimeMax, SIGNAL(valueChanged(double)), this, SLOT(onChangedValue()));
+        hLayout->setMargin(0);
     }
     hLayout->addStretch(1);
     setLayout(hLayout);

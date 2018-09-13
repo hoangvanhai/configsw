@@ -24,11 +24,12 @@ public:
     void setRealtimeLog(bool en);
     void sendData(const std::string &cmd);
 
+    void setCommunication(std::shared_ptr<ibc::layer2> conn);
+
 signals:
 
     void signalConnectionEvent(int event);
-    void signalChargerData(const QString &string);
-    void signalEnablePanel(bool en);
+    void signalChargerData(const QString &string);    
 private slots:
     void updateChart(qreal current, qreal voltage);
     void onBtnOpenConnection();
@@ -71,6 +72,7 @@ private:
 
     QToolButton     *btnClear;
     QCheckBox       *checkVusb, *checkLogData;
+
 
 
     QString testString;

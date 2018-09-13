@@ -19,7 +19,7 @@ Develop::~Develop()
 
 void Develop::initVariable()
 {    
-    ibc_obj_ = std::make_shared<ibc::layer2>();    
+    ibc_obj_ = std::make_shared<ibc::layer2>();
     hTimerControl.setInterval(2000);
     hTimerTest.setInterval(100);
     hTimerTest.start();
@@ -204,8 +204,7 @@ void Develop::createConnection()
     connect(btnOpenConnection, SIGNAL(clicked(bool)), this, SLOT(onBtnOpenConnection()));
     connect(btnCloseConnection, SIGNAL(clicked(bool)), this, SLOT(onBtnCloseConnection()));
     connect(this, SIGNAL(signalConnectionEvent(int)), this, SLOT(recvConnectionEvent(int)));
-    connect(this, SIGNAL(signalChargerData(QString)), this, SLOT(recvChargerDataEvent(QString)));
-    connect(this, SIGNAL(signalEnablePanel(bool)), this, SLOT(onEnablePanel(bool)));
+    connect(this, SIGNAL(signalChargerData(QString)), this, SLOT(recvChargerDataEvent(QString)));    
     connect(checkLogData, SIGNAL(toggled(bool)), this, SLOT(onBtnCheckLog()));
     connect(checkVusb, SIGNAL(toggled(bool)), this, SLOT(onBtnCheckVusb()));
     connect(btnClear, SIGNAL(clicked(bool)), this, SLOT(onBtnClear()));
@@ -292,7 +291,7 @@ void Develop::recvConnectionEvent(int event)
         statusBar()->setStyleSheet("QStatusBar { color: green;}");
         statusBar()->showMessage("control port connected to " +
                                  app::config::instance()->get_app_setting().control.port_name);
-        emit signalEnablePanel(true);
+        onEnablePanel(true);
         break;
     case communication::Status_Disconnected:
         btnOpenConnection->setEnabled(true);
@@ -304,7 +303,7 @@ void Develop::recvConnectionEvent(int event)
         } else {
             statusBar()->showMessage(tr("control port is closed"));
         }
-        emit signalEnablePanel(false);
+        onEnablePanel(false);
         break;
     case communication::Status_Device_Disconnected:
         btnOpenConnection->setEnabled(true);
@@ -314,7 +313,7 @@ void Develop::recvConnectionEvent(int event)
         statusBar()->showMessage("Lost connection with " +
                                  app::config::instance()->get_app_setting().control.port_name +
                                  " stop control");
-        emit signalEnablePanel(false);
+        onEnablePanel(false);
         break;
     default:
         std::cout << "def state\n";
@@ -336,6 +335,11 @@ void Develop::sendData(const std::string &data)
         QMessageBox::warning(this, "Connection error",
                              "Connection not open, open and try again !");
     }
+}
+
+void Develop::setCommunication(std::shared_ptr<ibc::layer2> conn)
+{
+    ibc_obj_ = conn;
 }
 
 void Develop::updateChart(qreal current, qreal voltage)

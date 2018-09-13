@@ -20,7 +20,7 @@ MainWindow::~MainWindow()
 void MainWindow::initVariable()
 {
     app::config::instance()->open_file("setup.ini");
-    app::config::instance()->load_config_all();
+    app::config::instance()->load_config_all();    
 }
 
 void MainWindow::createElement()

@@ -7,6 +7,7 @@
 #include <develop.h>
 #include <setting.h>
 #include <chargeditor.h>
+#include <layer2.h>
 
 
 class MainWindow : public QMainWindow
@@ -40,6 +41,8 @@ private:
     QComboBox   *comTheme;
 
     QPushButton *min, *max, *close;
+
+    std::shared_ptr<ibc::layer2> ibc_obj_;
 
     // frameless windows implement
 signals:

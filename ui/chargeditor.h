@@ -40,18 +40,19 @@ public:
     void createContent();
     void createConnection();
     bool loadExportData(const QString &file);
-
     void drawChart();
     void importDataFromFile(const QString &file);
     void exportDataToFile(const QString &file);
     void printNodeInfo(const NodeInfo &node);
-
     bool loadImportData(const QString &file);
-
     void writeRowToFile(const std::vector<std::string> row);
     void closeFile();    
-signals:
+    void setCommunication(std::shared_ptr<ibc::layer2> conn);
+    void sendData(const std::string &cmd);
 
+signals:
+    void signalConnectionEvent(int event);
+    void signalChargerData(const QString &string);    
 public slots:
     void onBtnAddPoint();
     void onBtnRemPoint();
@@ -60,6 +61,11 @@ public slots:
     void onBtnImport();
     void onBtnExport();
     void updateChart();
+    void onBtnOpenConnection();
+    void onBtnCloseConnection();
+    void recvConnectionEvent(int event);
+    void recvChargerDataEvent(const QString &str);
+    void onEnablePanel(bool en);
 
 private:
     QChartView          *chartView;
@@ -84,7 +90,7 @@ private:
 
     std::shared_ptr<CSVFile> loader;
 
-
+    std::shared_ptr<ibc::layer2> ibc_obj_;
 
 };
 
