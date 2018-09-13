@@ -78,9 +78,9 @@ void MainWindow::createLayout()
     layout->addWidget(close, 0);
 
 
-    tabWidget->addTab(setting, tr("SETTING"));
-    tabWidget->addTab(develop, tr("MONITOR"));
+    tabWidget->addTab(setting, tr("SETTING"));    
     tabWidget->addTab(editor, tr("EDITOR"));
+    tabWidget->addTab(develop, tr("MONITOR"));
     tabWidget->setCurrentWidget(editor);
 
     QString wgstyle = QString( "QTabBar::tab { height: 32px; width: 180 px;}" );

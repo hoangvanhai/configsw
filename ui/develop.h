@@ -7,7 +7,7 @@
 #include <xlsx/xlsxdocument.h>
 #include <layer2.h>
 #include <config/config.h>
-#include <controldock.h>
+#include <QSerialPort>
 
 class Develop : public QMainWindow
 {
@@ -20,6 +20,9 @@ public:
     void createContent();
     void createLayout();
     void createConnection();
+    void setVusbEnable(bool en);
+    void setRealtimeLog(bool en);
+    void sendData(const std::string &cmd);
 
 signals:
 
@@ -27,41 +30,53 @@ signals:
     void signalChargerData(const QString &string);
     void signalEnablePanel(bool en);
 private slots:
-    void openConnection();
-    void closeConnection();
-    void showControlPanel();
+    void updateChart(qreal current, qreal voltage);
+    void onBtnOpenConnection();
+    void onBtnCloseConnection();
+    void onBtnCheckVusb();
+    void onBtnCheckLog();
+    void onBtnClear();
     void recvChargerDataEvent(const QString &string);
-    void recvConnectionEvent(int event);
-    void onTimerClb();
-    void onShowStatusMsg(const QString &status);
-    void readData();
-
-public slots:
-    void onSendData(const std::string &data);
-
+    void recvConnectionEvent(int event);        
+    void onEnablePanel(bool en);
+    void onTimeout();
 private:
 
     QToolBar *toolBar;
     QVBoxLayout *mainLayout;
-    QWidget *centerWidget;
+    QGroupBox *mainGroup;
+    QSplitter *hSplitter;
 
     QToolButton *btnOpenConnection,
-                *btnCloseConnection,
-                *btnShowControlPanel;
+                *btnCloseConnection;
 
-    ControlDock *control;
 
-    QToolButton *btnClear, *btnSave;
 
-    QSplineSeries *series;
-    QChart *ivChart;
-    QValueAxis *ivXAxis;
+    QSplineSeries   *iSeries;
+    QSplineSeries   *vSeries;
 
-    QSerialPort *m_serial = nullptr;
+    QChart          *chart;
+    QChartView      *chartView;
 
     std::shared_ptr<ibc::layer2> ibc_obj_;
 
     QTimer  hTimerControl;
+    QTimer  hTimerTest;
+
+    QGroupBox *groupStatus, *groupControl;
+
+    QLineEdit       *editSTT, *editID;
+    QDoubleSpinBox  *editPV, *editPI, *editPP,
+                    *editBV, *editBI, *editBC;
+
+    QToolButton     *btnClear;
+    QCheckBox       *checkVusb, *checkLogData;
+
+
+    QString testString;
+    QString controlString;
+    qreal       span;
+    qreal       count;
 
 };
 

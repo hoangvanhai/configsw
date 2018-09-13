@@ -39,16 +39,17 @@ public:
     void createLayout();
     void createContent();
     void createConnection();
-    bool exportDataToFile(const QString &file);
+    bool loadExportData(const QString &file);
 
     void drawChart();
     void importDataFromFile(const QString &file);
+    void exportDataToFile(const QString &file);
     void printNodeInfo(const NodeInfo &node);
 
-    bool loadImportFile(const QString &file);
+    bool loadImportData(const QString &file);
 
     void writeRowToFile(const std::vector<std::string> row);
-    void closeFile();
+    void closeFile();    
 signals:
 
 public slots:
@@ -112,7 +113,7 @@ public slots:
     void onChangedValue();
  private:
     QComboBox *comType;
-    QDoubleSpinBox  *spCurrent, *spVoltage, *spTimeMax;
+    QDoubleSpinBox  *spCurrent, *spVoltage, *spTimeMax;    
     int     id_;
 };
 

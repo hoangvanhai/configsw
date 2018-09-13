@@ -36,6 +36,7 @@ void ChargEditor::createElement()
     chart->setTitle("GRAPH");
     chart->setAnimationOptions(QChart::SeriesAnimations);
     chartView->setRenderHint(QPainter::Antialiasing, true);
+    chartView->chart()->setTheme(QChart::ChartThemeBlueCerulean);
     iSeries->setName("current");
     vSeries->setName("voltage");
     iSeries->setColor(QColor("red"));
@@ -44,7 +45,7 @@ void ChargEditor::createElement()
     hSplitter = new QSplitter(Qt::Horizontal);
     vSplitter = new QSplitter(Qt::Vertical);
 
-    groupEditor = new QGroupBox("CHARACTER EDITOR", this);
+    groupEditor = new QGroupBox("I-V CHARACTER EDITOR", this);
     groupControl = new QGroupBox("CONTROL", this);
 
     btnAddPoint = new QPushButton("ADD POINT");
@@ -149,7 +150,7 @@ void ChargEditor::createConnection()
     connect(btnExport, SIGNAL(clicked(bool)), this, SLOT(onBtnExport()));
 }
 
-bool ChargEditor::exportDataToFile(const QString &file)
+bool ChargEditor::loadExportData(const QString &file)
 {
 
     if(listEditor.size() > 0) {
@@ -231,11 +232,6 @@ void ChargEditor::drawChart()
     }
 }
 
-void ChargEditor::importDataFromFile(const QString &file)
-{
-    (void)file;
-}
-
 void ChargEditor::printNodeInfo(const NodeInfo &node)
 {
     qDebug() << "id " << node.id <<
@@ -245,7 +241,7 @@ void ChargEditor::printNodeInfo(const NodeInfo &node)
                 " time " << node.time;
 }
 
-bool ChargEditor::loadImportFile(const QString &file)
+bool ChargEditor::loadImportData(const QString &file)
 {
     loader = std::make_shared<CSVFile>(file.toStdString());
     int err = loader->open();
@@ -303,7 +299,7 @@ bool ChargEditor::loadImportFile(const QString &file)
 
             return true;
         } else {
-            return true;
+            return false;
         }
     } else {
         return false;
@@ -315,7 +311,6 @@ void ChargEditor::writeRowToFile(const std::vector<std::string> row)
     if(loader) {
          if(loader->is_open()) {
              loader->write_row(row);
-             //qDebug() << "write row";
          }
     }
 }
@@ -365,79 +360,87 @@ void ChargEditor::onBtnRemPoint()
     }
 }
 
-void ChargEditor::onBtnSelectExport()
+
+void ChargEditor::importDataFromFile(const QString &file)
 {
-    {
-        QString fileName = QFileDialog::getSaveFileName(this,
-             tr("Select file to export"), filePath == "" ? QDir::homePath() : filePath, tr("CSV file (*.csv)"));
-
-        if(fileName != "") {
-            filePath = QDir::cleanPath(fileName);
-            app::appsetting setting = app::config::instance()->get_app_setting();
-            setting.filePathExport = filePath;
-            app::config::instance()->save_config_all(setting);
-            editFileExport->setText(fileName);
-
-            if(exportDataToFile(fileName)) {
-                QMessageBox::information(this, "Information",
-                                     "export successful !");
-            } else {
-                QMessageBox::warning(this, "Warning",
-                                     "export failed, no data !");
-            }
-        }
-    }
-}
-
-void ChargEditor::onBtnSelectImport()
-{
-
-    QString fileName = QFileDialog::getOpenFileName(this,
-         tr("Select file to export"), filePath == "" ? QDir::homePath() : filePath, tr("CSV file (*.csv)"));
-
-    if(fileName != "") {
-        filePath = QDir::cleanPath(fileName);
+    if(file != "" && file.endsWith(".csv")) {
+        filePath = QDir::cleanPath(file);
         app::appsetting setting = app::config::instance()->get_app_setting();
         setting.filePathImport = filePath;
         app::config::instance()->save_config_all(setting);
-        editFileImport->setText(fileName);
 
-        if(loadImportFile(fileName)) {
+        if(loadImportData(file)) {
             QMessageBox::information(this, "Information",
                                      "import successful !");
         } else {
             QMessageBox::warning(this, "Warning",
                                  "import failed, no data !");
         }
+    } else {
+        QMessageBox::warning(this, "Warning",
+                             "Import failed, invalid file name !");
     }
+}
 
+void ChargEditor::exportDataToFile(const QString &file)
+{
+    if(file != "" && file.endsWith(".csv")) {
+        filePath = QDir::cleanPath(file);
+        app::appsetting setting = app::config::instance()->get_app_setting();
+        setting.filePathExport = filePath;
+        app::config::instance()->save_config_all(setting);
+
+        if(loadExportData(file)) {
+            QMessageBox::information(this, "Information",
+                                 "export successful !");
+        } else {
+            QMessageBox::warning(this, "Warning",
+                                 "export failed, no data !");
+        }
+    } else {
+        QMessageBox::warning(this, "Warning",
+                         "export failed, invalid file name !");
+    }
+}
+
+
+void ChargEditor::onBtnSelectExport()
+{
+
+    QString fileName =
+            QFileDialog::getSaveFileName(this,
+                                         tr("Select file to export"),
+                                         filePath == "" ? QDir::homePath() : filePath,
+                                         tr("CSV file (*.csv)"));
+
+    if(fileName != "") {
+        editFileExport->setText(fileName);
+        exportDataToFile(fileName);
+    }
+}
+
+void ChargEditor::onBtnSelectImport()
+{
+
+    QString fileName =
+            QFileDialog::getOpenFileName(this,
+                                         tr("Select file to export"),
+                                         filePath == "" ? QDir::homePath() : filePath,
+                                         tr("CSV file (*.csv)"));
+    if(fileName != "") {
+        editFileImport->setText(fileName);
+        importDataFromFile(fileName);
+    }
 }
 
 void ChargEditor::onBtnImport()
 {
-    if(editFileImport->text() != "") {
-        if(loadImportFile(editFileImport->text())) {
-            QMessageBox::information(this, "Information",
-                                     "import successful !");
-        }
-    } else {
-        QMessageBox::warning(this, "Warning",
-                             "Please select file before import !");
-    }
+    importDataFromFile(editFileImport->text());
 }
 
 void ChargEditor::onBtnExport()
 {
-    if(editFileExport->text() != "") {
-        if(exportDataToFile(editFileExport->text())) {
-            QMessageBox::information(this, "Information",
-                                     "export successful !");
-        }
-    } else {
-        QMessageBox::warning(this, "Warning",
-                             "Please select file before export !");
-    }
-
+    exportDataToFile(editFileExport->text());
 }
 
 
@@ -457,6 +460,7 @@ LineEditor::LineEditor(int id, QWidget *parent) :
         comType->addItem("idle");
         QSpinBox *rowId = new QSpinBox;
         rowId->setReadOnly(true);
+        rowId->setButtonSymbols(QAbstractSpinBox::NoButtons);
         rowId->setValue(id);
         hLayout->addWidget(rowId);
         hLayout->addWidget(new QLabel(tr("Type:")));

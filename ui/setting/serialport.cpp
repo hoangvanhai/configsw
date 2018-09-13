@@ -56,7 +56,7 @@ void SerialPort::createLayout()
     {
     QGroupBox *groupSelect = new QGroupBox("Serial Select");
     QHBoxLayout *hLayout = new QHBoxLayout;
-    listApp->addItems(QStringList() << "Debug" << "Streaming IBC" << "Program");
+    listApp->addItems(QStringList() << "Charger" << "Streaming IBC" << "Program");
     hLayout->addWidget(new QLabel(tr("Type")), 0, Qt::AlignRight);
     hLayout->addWidget(listApp, 0, Qt::AlignLeft);
     hLayout->addSpacerItem(new QSpacerItem(10,10));
@@ -162,7 +162,7 @@ void SerialPort::loadAllUiSetup()
 {
     app::appsetting setting = app::config::instance()->get_app_setting();
 
-    if(listApp->currentText() == "Debug") {
+    if(listApp->currentText() == "Charger") {
         loadSerialSetup(setting.control);
     } else if(listApp->currentText() == "Streaming IBC") {
         loadSerialSetup(setting.stream);
@@ -328,7 +328,7 @@ void SerialPort::setSerialPort()
 {
     app::appsetting setting = app::config::instance()->get_app_setting();
 
-    if(listApp->currentText() == "Debug") {
+    if(listApp->currentText() == "Charger") {
         saveSerialSetup(setting.control);
     } else if(listApp->currentText() == "Streaming IBC") {
         saveSerialSetup(setting.stream);
