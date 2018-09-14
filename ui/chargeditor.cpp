@@ -136,17 +136,19 @@ void ChargEditor::createLayout()
 
     commLayout->addWidget(btnConnect, 0, 0);
     commLayout->addWidget(btnRead, 0, 1);
-    commLayout->addWidget(new QLabel("DEV INFO"), 0, 2);
-    commLayout->addWidget(editDevInfo, 0, 3);
-    commLayout->addWidget(new QLabel("DEV SERIAL"), 0, 4);
+    commLayout->addWidget(new QLabel("DEVICE MODEL"), 0, 2);
+    commLayout->addWidget(editDevModel, 0, 3);
+//    commLayout->addWidget(new QLabel("DEV INFO"), 0, 2);
+//    commLayout->addWidget(editDevInfo, 0, 3);
+    commLayout->addWidget(new QLabel("SERIAL"), 0, 4);
     commLayout->addWidget(editDevSerial, 0, 5);
     commLayout->addItem(new QSpacerItem(20, 20, QSizePolicy::Expanding), 0, 6);
     commLayout->addWidget(btnDisconnect, 1, 0);
     commLayout->addWidget(btnWrite, 1, 1);
-    commLayout->addWidget(new QLabel("DEV MODEL"), 1, 2);
-    commLayout->addWidget(editDevModel, 1, 3);
-    commLayout->addWidget(new QLabel("IMP MODEL"), 1, 4);
-    commLayout->addWidget(editImportModel, 1, 5);
+//    commLayout->addWidget(new QLabel("DEV MODEL"), 1, 2);
+//    commLayout->addWidget(editDevModel, 1, 3);
+    commLayout->addWidget(new QLabel("IMPORT MODEL"), 1, 2);
+    commLayout->addWidget(editImportModel, 1, 3);
     commLayout->setColumnStretch(6, 1);
 
 
@@ -177,7 +179,11 @@ void ChargEditor::createLayout()
     btnBrowFileExport->setToolTip(tr("select file to export"));
     btnRemPoint->setToolTip(tr("remove the last point on editor screen"));
     btnAddPoint->setToolTip(tr("add to the end of editor screen"));
-    btnWrite->setToolTip(tr("download config to the board"));       
+    btnWrite->setToolTip(tr("download data from IMPORT MODEL and editor "
+                            "screen to the device"));
+    btnRead->setToolTip(tr("read device info, fill data to DEVICE MODEL and "
+                           "SERIAL"));
+
 
     onEnablePanel(false);
 }

@@ -14,13 +14,16 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-
+    if(helpWindow != Q_NULLPTR) {
+        delete helpWindow;
+    }
 }
 
 void MainWindow::initVariable()
 {
     app::config::instance()->open_file("setup.ini");
-    app::config::instance()->load_config_all();    
+    app::config::instance()->load_config_all();
+    helpWindow = Q_NULLPTR;
 }
 
 void MainWindow::createElement()
@@ -32,15 +35,16 @@ void MainWindow::createElement()
     centerWidget = new QWidget;
     mainLayout = new QVBoxLayout;
     comTheme = new QComboBox(this);
+
 }
 
 void MainWindow::createContent()
 {
-    setWindowTitle("acitdev tool kit");
+    setWindowTitle("Charger management tool");
 }
 
 void MainWindow::createLayout()
-{
+{    
     setWindowFlags(Qt::FramelessWindowHint  |
                    Qt::WindowSystemMenuHint |
                    Qt::WindowMinimizeButtonHint);
@@ -48,14 +52,20 @@ void MainWindow::createLayout()
     QIcon closeIcon = style->standardIcon(QStyle::SP_TitleBarCloseButton);
     QIcon maxIcon   = style->standardIcon(QStyle::SP_TitleBarMaxButton);
     QIcon minIcon   = style->standardIcon(QStyle::SP_TitleBarMinButton);
-
+    QIcon helpIcon  = style->standardIcon(QStyle::SP_TitleBarContextHelpButton);
     min = new QPushButton;
     max = new QPushButton;
     close = new QPushButton;
+    help = new QPushButton;
 
     min->setIcon(minIcon);
+    min->setToolTip("Minimize window");
     max->setIcon(maxIcon);
+    max->setToolTip("Maximize window");
     close->setIcon(closeIcon);
+    close->setToolTip("Close application");
+    help->setIcon(helpIcon);
+    help->setToolTip("Open help window");
 
     comTheme->addItem("Light", QChart::ChartThemeLight);
     comTheme->addItem("Blue Cerulean", QChart::ChartThemeBlueCerulean);
@@ -71,6 +81,7 @@ void MainWindow::createLayout()
     layout->addStretch(1);
     layout->addWidget(new QLabel(tr("BATTERY CHARGER MANAGERMENT")));
     layout->addStretch(1);
+    layout->addWidget(help);
     layout->addWidget(new QLabel(tr("Theme")));
     layout->addWidget(comTheme, 0);
     layout->addWidget(min, 0);
@@ -107,6 +118,7 @@ void MainWindow::createConnection()
     connect(close, SIGNAL(clicked(bool)), this, SLOT(closeWindow()));
 
     connect(comTheme, SIGNAL(currentIndexChanged(int)), this, SLOT(updateTheme()));
+    connect(help, SIGNAL(clicked(bool)), this, SLOT(openHelp()));
 }
 
 void MainWindow::createTitleButton()
@@ -169,6 +181,22 @@ void MainWindow::updateTheme()
         qApp->setPalette(pal);
 }
 
+void MainWindow::openHelp()
+{
+    if(helpWindow == Q_NULLPTR) {
+        helpWindow = new HelpWindow;
+        helpWindow->show();
+    }
+
+    if(helpWindow->isHidden()) {
+        helpWindow->show();
+    }
+
+    if(!helpWindow->isActiveWindow()) {
+        helpWindow->activateWindow();
+    }
+}
+
 
 // Frameless windows implement
 
@@ -205,4 +233,19 @@ void MainWindow::mouseReleaseEvent(QMouseEvent *event)
     if(event->button() == Qt::LeftButton) {
         isMouseDown = false;
     }
+}
+
+
+HelpWindow::HelpWindow(QWidget *parent) : QWidget(parent)
+{
+    QLabel *label = new QLabel(this);
+    label->setText(tr("This is help windows ...\r\n we will fill the content later\r\n continue ..."));
+    setWindowTitle("Help window");
+    setMinimumSize(800, 600);
+}
+
+void HelpWindow::closeEvent(QCloseEvent *event)
+{
+    hide();
+    event->ignore();
 }

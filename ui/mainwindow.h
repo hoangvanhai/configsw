@@ -9,6 +9,7 @@
 #include <chargeditor.h>
 #include <layer2.h>
 
+class HelpWindow;
 
 class MainWindow : public QMainWindow
 {
@@ -32,7 +33,7 @@ private:
     QTabWidget *tabWidget;
     QWidget *centerWidget;
     QVBoxLayout *mainLayout;
-
+    HelpWindow  *helpWindow;
 
     Setting     *setting;
     Develop     *develop;    
@@ -40,17 +41,19 @@ private:
 
     QComboBox   *comTheme;
 
-    QPushButton *min, *max, *close;
+    QPushButton *min, *max, *close, *help;
 
     std::shared_ptr<ibc::layer2> ibc_obj_;
 
     // frameless windows implement
 signals:
+
     void minimize();
     void maximize();
     void quit();
 
 private slots:
+    void openHelp();
     void closeWindow() {QApplication::quit(); }
     void minimizeWindow() {setWindowState(Qt::WindowMinimized);}
     void maximizeWindow();
@@ -65,6 +68,18 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event);
 
     QPoint mousePoint;
+};
+
+
+class HelpWindow : public QWidget
+{
+    Q_OBJECT
+public:
+    explicit HelpWindow(QWidget *parent = 0);
+    void closeEvent(QCloseEvent *event);
+signals:
+
+public slots:
 };
 
 #endif // MAINWINDOW_H
