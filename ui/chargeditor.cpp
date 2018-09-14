@@ -47,10 +47,10 @@ void ChargEditor::createElement()
     vSplitter = new QSplitter(Qt::Vertical);
 
     groupEditor = new QGroupBox("I-V CHARACTER EDITOR", this);
-    groupControl = new QGroupBox("CONTROL", this);
+    groupControl = new QGroupBox("IMPORT/EXPORT", this);
 
-    btnAddPoint = new QPushButton("ADD POINT");
-    btnRemPoint = new QPushButton("REM POINT");
+    btnAddPoint = new QPushButton("+");
+    btnRemPoint = new QPushButton("-");
 
     btnConnect = new QPushButton  ("   CONNECT   ");
     btnDisconnect = new QPushButton("DISCONNECT");
@@ -61,16 +61,30 @@ void ChargEditor::createElement()
     btnBrowFileExport->setIcon(QIcon(":/icon/open-folder.png"));
 
     btnWrite = new QToolButton;
-    btnWrite->setIcon(QIcon(":/icon/download.png"));
-    btnWrite->setText("DOWNLOAD");
+    btnRead = new QToolButton;
+    //btnWrite->setIcon(QIcon(":/icon/download.png"));
+    btnWrite->setText("WRITE DATA");
+    btnRead->setText(" READ INFO ");
 
     editFileImport = new QLineEdit;
     editFileExport = new QLineEdit;
 
-    btnImport = new QPushButton("IMPORT");
-    btnExport = new QPushButton("EXPORT");
+    editDevInfo = new QLineEdit;
+    editDevModel = new QLineEdit;
+    editDevSerial = new QLineEdit;
+    editImportModel = new QLineEdit;
+
+    btnImport = new QPushButton;
+    btnImport->setIcon(QIcon(":/icon/right.png"));
+    btnImport->setIconSize(QSize(50, 20));
+    btnExport = new QPushButton;
+    btnExport->setIcon(QIcon(":/icon/left.png"));
+    btnExport->setIconSize(QSize(50, 20));
     btnImport->setToolTip(tr("import data from file"));
     btnExport->setToolTip(tr("export data to file"));
+
+    groupComm  = new QGroupBox("COMMUNICATION");
+
 }
 
 void ChargEditor::createLayout()
@@ -78,7 +92,21 @@ void ChargEditor::createLayout()
     QScrollArea *scroll = new QScrollArea(this);
     QVBoxLayout *vBox = new QVBoxLayout;
     QWidget *scWidget = new QWidget(this);
+    QHBoxLayout *hBox = new QHBoxLayout;
 
+    QWidget *ctrlWidget = new QWidget(this);
+    QVBoxLayout *ctrlVBox = new QVBoxLayout;
+    QGridLayout *commLayout = new QGridLayout;
+    groupComm->setLayout(commLayout);
+    ctrlWidget->setLayout(ctrlVBox);
+    ctrlVBox->addWidget(groupComm);
+    ctrlVBox->addWidget(groupControl);
+    ctrlVBox->addStretch(1);
+
+    hBox->addWidget(btnAddPoint);
+    hBox->addWidget(btnRemPoint);
+    hBox->addStretch(1);
+    vBox->addLayout(hBox);
     vBox->addWidget(scroll);
     groupEditor->setLayout(vBox);
     scroll->setWidget(scWidget);
@@ -87,7 +115,7 @@ void ChargEditor::createLayout()
 
     hSplitter->addWidget(vSplitter);
     hSplitter->addWidget(groupEditor);
-    vSplitter->addWidget(groupControl);
+    vSplitter->addWidget(ctrlWidget);
     vSplitter->addWidget(chartView);    
 
     //layoutEditor->setContentsMargins(0,0,0,0);
@@ -106,32 +134,50 @@ void ChargEditor::createLayout()
     QGridLayout *gridLayout = new QGridLayout;
     groupControl->setLayout(gridLayout);
 
-    gridLayout->addWidget(btnConnect, 0, 2);
-    gridLayout->addWidget(btnDisconnect, 0, 3);
+    commLayout->addWidget(btnConnect, 0, 0);
+    commLayout->addWidget(btnRead, 0, 1);
+    commLayout->addWidget(new QLabel("DEV INFO"), 0, 2);
+    commLayout->addWidget(editDevInfo, 0, 3);
+    commLayout->addWidget(new QLabel("DEV SERIAL"), 0, 4);
+    commLayout->addWidget(editDevSerial, 0, 5);
+    commLayout->addItem(new QSpacerItem(20, 20, QSizePolicy::Expanding), 0, 6);
+    commLayout->addWidget(btnDisconnect, 1, 0);
+    commLayout->addWidget(btnWrite, 1, 1);
+    commLayout->addWidget(new QLabel("DEV MODEL"), 1, 2);
+    commLayout->addWidget(editDevModel, 1, 3);
+    commLayout->addWidget(new QLabel("IMP MODEL"), 1, 4);
+    commLayout->addWidget(editImportModel, 1, 5);
+    commLayout->setColumnStretch(6, 1);
 
-    gridLayout->addWidget(editFileImport, 1, 0);
-    gridLayout->addWidget(btnBrowFileImport, 1, 1);
-    gridLayout->addWidget(btnImport, 1, 2);
-    gridLayout->addWidget(btnWrite, 1, 3, 2, 1);
 
-    gridLayout->addWidget(editFileExport, 2, 0);
-    gridLayout->addWidget(btnBrowFileExport, 2, 1);
-    gridLayout->addWidget(btnExport, 2, 2);
-
-    gridLayout->addWidget(btnRemPoint, 3, 2);
-    gridLayout->addWidget(btnAddPoint, 3, 3);
+    gridLayout->addWidget(editFileImport, 0, 0);
+    gridLayout->addWidget(btnBrowFileImport, 0, 1);
+    gridLayout->addWidget(btnImport, 0, 2);
+    gridLayout->addWidget(editFileExport, 1, 0);
+    gridLayout->addWidget(btnBrowFileExport, 1, 1);
+    gridLayout->addWidget(btnExport, 1, 2);
 
 
-    btnWrite->setMinimumHeight(50);
-    btnWrite->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-    btnWrite->setIconSize(QSize(30, 30));
+
+    btnAddPoint->setMaximumWidth(30);
+    btnRemPoint->setMaximumWidth(30);
+
+
+
+//    btnWrite->setMinimumHeight(50);
+//    btnWrite->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+//    btnWrite->setIconSize(QSize(30, 30));
+
+
     gridLayout->setColumnStretch(0, 1);
 
     btnConnect->setToolTip(tr("connect serial port to charger"));
     btnDisconnect->setToolTip(tr("disconnect serial port to charger"));
+    btnBrowFileImport->setToolTip(tr("select file to import"));
+    btnBrowFileExport->setToolTip(tr("select file to export"));
     btnRemPoint->setToolTip(tr("remove the last point on editor screen"));
     btnAddPoint->setToolTip(tr("add to the end of editor screen"));
-    btnWrite->setToolTip(tr("download config to the board"));
+    btnWrite->setToolTip(tr("download config to the board"));       
 
     onEnablePanel(false);
 }
@@ -231,7 +277,7 @@ void ChargEditor::setCommunication(std::shared_ptr<ibc::layer2> conn)
 void ChargEditor::sendData(const std::string &cmd)
 {
     if(ibc_obj_->get_status() == communication::Status_Connected) {
-        int err = ibc_obj_->send_raw_data(data.data(), data.length());
+        int err = ibc_obj_->send_raw_data(cmd.data(), cmd.length());
         (void)err;
         //std::cout << "control send data: " << data << " len " << err;
         fflush(stdout);
@@ -397,10 +443,10 @@ void ChargEditor::importDataFromFile(const QString &file)
 
         if(loadImportData(file)) {
             QMessageBox::information(this, "Information",
-                                     "import successful !");
+                                     "Import successful !");
         } else {
             QMessageBox::warning(this, "Warning",
-                                 "import failed, no data !");
+                                 "Import failed, no data !");
         }
     } else {
         QMessageBox::warning(this, "Warning",
@@ -418,14 +464,14 @@ void ChargEditor::exportDataToFile(const QString &file)
 
         if(loadExportData(file)) {
             QMessageBox::information(this, "Information",
-                                 "export successful !");
+                                 "Export successful !");
         } else {
             QMessageBox::warning(this, "Warning",
-                                 "export failed, no data !");
+                                 "Export failed, no data !");
         }
     } else {
         QMessageBox::warning(this, "Warning",
-                         "export failed, invalid file name !");
+                         "Export failed, invalid file name !");
     }
 }
 
@@ -571,7 +617,12 @@ void ChargEditor::recvChargerDataEvent(const QString &str)
 void ChargEditor::onEnablePanel(bool en)
 {
     btnWrite->setEnabled(en);
+    btnRead->setEnabled(en);
     btnDisconnect->setEnabled(en);
+    if(en)
+        btnDisconnect->setFocus();
+    else
+        btnConnect->setFocus();
 }
 
 

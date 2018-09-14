@@ -77,14 +77,15 @@ private:
     QSplitter           *hSplitter;
     QSplitter           *vSplitter;
 
-    QGroupBox           *groupEditor, *groupControl;
+    QGroupBox           *groupEditor, *groupControl, *groupComm;
     QPushButton         *btnAddPoint, *btnRemPoint;
 
     QPushButton         *btnConnect, *btnDisconnect, *btnBrowFileImport,
                         *btnBrowFileExport, *btnImport, *btnExport;
-    QToolButton         *btnWrite;
+    QToolButton         *btnWrite, *btnRead;
 
-    QLineEdit           *editFileImport, *editFileExport;
+    QLineEdit           *editFileImport, *editFileExport, *editDevInfo,
+                        *editDevSerial, *editDevModel, *editImportModel;
     QString             filePath;
     int                 numLine;
 

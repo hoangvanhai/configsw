@@ -23,5 +23,9 @@
         <file>icon/folder.png</file>
         <file>icon/open-folder.png</file>
         <file>icon/download.png</file>
+        <file>icon/arrowleft.png</file>
+        <file>icon/arrowright.png</file>
+        <file>icon/left.png</file>
+        <file>icon/right.png</file>
     </qresource>
 </RCC>
