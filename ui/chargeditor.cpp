@@ -19,7 +19,7 @@ void ChargEditor::initVariable()
     ibc_obj_ = std::make_shared<ibc::layer2>();
     app::appsetting setting = app::config::instance()->get_app_setting();
     numLine = 0;
-    filePath = setting.filePathImport;
+    filePath = setting.gen.filePathImport;
 }
 
 void ChargEditor::createElement()
@@ -192,8 +192,9 @@ void ChargEditor::createContent()
 {
     statusBar()->showMessage("Ready");
     app::appsetting setting = app::config::instance()->get_app_setting();
-    editFileImport->setText(setting.filePathImport);
-    editFileExport->setText(setting.filePathExport);
+    editFileImport->setText(setting.gen.filePathImport);
+    editFileExport->setText(setting.gen.filePathExport);
+    editImportModel->setText(setting.gen.model);
 }
 
 void ChargEditor::createConnection()
@@ -230,6 +231,7 @@ bool ChargEditor::loadExportData(const QString &file)
         loader = std::make_shared<CSVFile>(editFileExport->text().toStdString());
         int err = loader->open(true);
         if(err == 0) {
+            int i = 0;
 
             std::vector<std::string> row;
             row.push_back("No");
@@ -237,6 +239,7 @@ bool ChargEditor::loadExportData(const QString &file)
             row.push_back("Current");
             row.push_back("Voltage");
             row.push_back("Time");
+            row.push_back("Model");
             writeRowToFile(row);
 
             for(auto var : listData) {
@@ -246,7 +249,11 @@ bool ChargEditor::loadExportData(const QString &file)
                 row.push_back(QString::number(var.current).toStdString());
                 row.push_back(QString::number(var.voltage).toStdString());
                 row.push_back(QString::number(var.time).toStdString());
+                if(i == 0) {
+                    row.push_back(editImportModel->text().toStdString());
+                }
                 writeRowToFile(row);
+                i++;
             }
 
             closeFile();
@@ -347,20 +354,20 @@ bool ChargEditor::loadImportData(const QString &file)
                         line->setCurrent(str::Util::convert<double>(row.at(2), 0));
                         line->setVoltage(str::Util::convert<double>(row.at(3), 0));
                         line->setTime(str::Util::convert<double>(row.at(4), 0));
+                        if(row.size() >= 6)
+                            editImportModel->setText(QString(row.at(5).c_str()));
                         layoutEditor->addWidget(line);
-                        layoutEditor->addStretch(1);
-                        //connect(line, SIGNAL(changedValue()), this, SLOT(updateChart()));
+                        layoutEditor->addStretch(1);                        
                         listEditor.push_back(line);
                         numLine+=2;
-                    } else if (numLine < 22) {
+                    } else if (numLine <= 20) {
                         LineEditor *line = new LineEditor(numLine - 1, this);
                         line->setType(str::Util::convert<int>(row.at(1), 0));
                         line->setCurrent(str::Util::convert<double>(row.at(2), 0));
                         line->setVoltage(str::Util::convert<double>(row.at(3), 0));
                         line->setTime(str::Util::convert<double>(row.at(4), 0));
-                        qDebug() << "insert count = " << numLine;
+                        //qDebug() << "insert count = " << numLine;
                         layoutEditor->insertWidget(numLine - 1, line);
-                        //connect(line, SIGNAL(changedValue()), this, SLOT(updateChart()));
                         listEditor.insert(listEditor.size(), line);
                         numLine++;
                     } else {
@@ -410,9 +417,9 @@ void ChargEditor::onBtnAddPoint()
         connect(line, SIGNAL(changedValue()), this, SLOT(updateChart()));
         listEditor.push_back(line);
         numLine+=2;
-    } else if (numLine < 20) {
+    } else if (numLine <= 20) {
         LineEditor *line = new LineEditor(numLine - 1, this);
-        qDebug() << "insert count = " << numLine;
+        //qDebug() << "insert count = " << numLine;
         layoutEditor->insertWidget(numLine - 1, line);
         connect(line, SIGNAL(changedValue()), this, SLOT(updateChart()));
         listEditor.insert(listEditor.size(), line);
@@ -426,7 +433,7 @@ void ChargEditor::onBtnAddPoint()
 void ChargEditor::onBtnRemPoint()
 {
     if(layoutEditor->count() >= 2) {
-        qDebug() << "delete at " << layoutEditor->count() - 2;
+        //qDebug() << "delete at " << layoutEditor->count() - 2;
         QWidget *widget = layoutEditor->takeAt(layoutEditor->count() - 2)->widget();        
         delete widget;
         //qDebug() << "removed count = " << layoutEditor->count();
@@ -443,13 +450,15 @@ void ChargEditor::importDataFromFile(const QString &file)
 {
     if(file != "" && file.endsWith(".csv")) {
         filePath = QDir::cleanPath(file);
-        app::appsetting setting = app::config::instance()->get_app_setting();
-        setting.filePathImport = filePath;
-        app::config::instance()->save_config_all(setting);
 
         if(loadImportData(file)) {
             QMessageBox::information(this, "Information",
                                      "Import successful !");
+            app::appsetting setting = app::config::instance()->get_app_setting();
+            setting.gen.filePathImport = file;
+            setting.gen.model = editImportModel->text();
+            app::config::instance()->save_config_general(setting.gen);
+
         } else {
             QMessageBox::warning(this, "Warning",
                                  "Import failed, no data !");
@@ -465,8 +474,9 @@ void ChargEditor::exportDataToFile(const QString &file)
     if(file != "" && file.endsWith(".csv")) {
         filePath = QDir::cleanPath(file);
         app::appsetting setting = app::config::instance()->get_app_setting();
-        setting.filePathExport = filePath;
-        app::config::instance()->save_config_all(setting);
+        setting.gen.filePathExport = file;
+        setting.gen.model = editImportModel->text();
+        app::config::instance()->save_config_general(setting.gen);
 
         if(loadExportData(file)) {
             QMessageBox::information(this, "Information",
@@ -535,7 +545,7 @@ void ChargEditor::onBtnOpenConnection()
         });
 
         ibc_obj_->set_ack(false);
-        bool proto = setting.protocol == "isc" ? true : false;
+        bool proto = setting.gen.protocol == "isc" ? true : false;
         ibc_obj_->set_protocol(proto);
 
 
@@ -666,6 +676,10 @@ LineEditor::LineEditor(int id, QWidget *parent) :
         hLayout->addWidget(new QLabel(tr("Time:")));
         hLayout->addWidget(spTimeMax);
 
+        setCurrent(0);
+        setVoltage(0);
+        setTime(0);
+
         connect(spCurrent, SIGNAL(valueChanged(double)), this, SLOT(onChangedValue()));
         connect(spVoltage, SIGNAL(valueChanged(double)), this, SLOT(onChangedValue()));
         connect(spTimeMax, SIGNAL(valueChanged(double)), this, SLOT(onChangedValue()));
@@ -697,7 +711,14 @@ int LineEditor::getType() const
 
 void LineEditor::setCurrent(double value)
 {
+    QPalette p;
     spCurrent->setValue(value);
+    if(spCurrent->value() <= 0) {
+        p.setColor(QPalette::Text, QColor("red"));
+    } else {
+        p.setColor(QPalette::Text, QColor("white"));
+    }
+    spCurrent->setPalette(p);
 }
 
 double LineEditor::getCurrent() const
@@ -707,7 +728,14 @@ double LineEditor::getCurrent() const
 
 void LineEditor::setVoltage(double value)
 {
+    QPalette p;
     spVoltage->setValue(value);
+    if(spVoltage->value() <= 0) {
+        p.setColor(QPalette::Text, QColor("red"));
+    } else {
+        p.setColor(QPalette::Text, QColor("white"));
+    }
+    spVoltage->setPalette(p);
 }
 
 double LineEditor::getVoltage() const
@@ -717,7 +745,14 @@ double LineEditor::getVoltage() const
 
 void LineEditor::setTime(double time)
 {
+    QPalette p;
     spTimeMax->setValue(time);
+    if(spTimeMax->value() <= 0) {
+        p.setColor(QPalette::Text, QColor("red"));
+    } else {
+        p.setColor(QPalette::Text, QColor("white"));
+    }
+    spTimeMax->setPalette(p);
 }
 
 double LineEditor::getTime() const
@@ -728,4 +763,36 @@ double LineEditor::getTime() const
 void LineEditor::onChangedValue()
 {
     emit changedValue();
+
+    QPalette p1, p2, p3;
+
+    if(spCurrent->value() <= 1) {
+        p1.setColor(QPalette::Text, QColor("red"));
+    } else {
+        qDebug() << "set white 1 " << spCurrent->value();
+        p1.setColor(QPalette::Text, QColor("white"));
+    }
+    spCurrent->setPalette(p1);
+    spCurrent->update();
+
+    if(spVoltage->value() <= 1) {
+        p2.setColor(QPalette::Text, QColor("red"));
+    } else {
+        qDebug() << "set white 2 " << spVoltage->value();
+        p2.setColor(QPalette::Text, QColor("white"));
+    }
+    spVoltage->setPalette(p2);
+    spVoltage->update();
+
+    if(spTimeMax->value() <= 1) {
+        p3.setColor(QPalette::Text, QColor("red"));
+    } else {
+        qDebug() << "set white 3 " << spTimeMax->value();
+        p3.setColor(QPalette::Text, QColor("white"));
+    }
+
+    spTimeMax->setPalette(p3);
+    spTimeMax->update();
+
+
 }

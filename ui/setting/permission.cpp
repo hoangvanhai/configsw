@@ -38,7 +38,7 @@ void Permission::createUiElem()
     mainLayout->addWidget(groupAdmin, 1, Qt::AlignTop | Qt::AlignLeft);
     }
 
-    listTheme->setCurrentText(setting.palette);
+    listTheme->setCurrentText(setting.gen.palette);
     updateAppTheme();
 }
 
@@ -50,7 +50,7 @@ void Permission::createConnection()
 void Permission::updateAppTheme()
 {
     app::appsetting setting = app::config::instance()->get_app_setting();
-    setting.palette = listTheme->currentText();
+    setting.gen.palette = listTheme->currentText();
     app::config::instance()->save_config_all(setting);
     qApp->setStyle(QStyleFactory::create("Fusion"));
     if(listTheme->currentText() == "dark") {

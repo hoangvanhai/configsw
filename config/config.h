@@ -32,17 +32,23 @@ struct battcharg{
     bool     charg;
 };
 
+struct general {
+    QString    conf_name;
+    QString display;
+    QString protocol;
+    QString palette;
+    QString filePathImport;
+    QString filePathExport;
+    QString model;
+};
+
 struct appsetting {
     serialport control;
     serialport program;
     serialport stream;
     battcharg batt;
     battcharg battdef;
-    QString display;
-    QString protocol;
-    QString palette;
-    QString filePathImport;
-    QString filePathExport;
+    general   gen;
 };
 
 
@@ -57,6 +63,11 @@ public:
     void open_file(const QString &file);
     void load_config_all();
     void save_config_all(appsetting setting);
+
+
+    void load_config_general(general &gen);
+    void save_config_general(const general &gen);
+
     void load_config_serial(serialport &port);
     void save_config_serial(const serialport &port);
 

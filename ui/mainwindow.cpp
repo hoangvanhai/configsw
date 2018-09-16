@@ -240,7 +240,7 @@ HelpWindow::HelpWindow(QWidget *parent) : QWidget(parent)
 {
     QLabel *label = new QLabel(this);
     label->setText(tr("This is help windows ...\r\n we will fill the content later\r\n continue ..."));
-    setWindowTitle("Help window");
+    setWindowTitle("Help");
     setMinimumSize(800, 600);
 }
 

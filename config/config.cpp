@@ -115,6 +115,8 @@ void config::save_battcharg_cfg(battcharg &setting)
 
 void config::load_config_all()
 {
+    setting_.gen.conf_name = "interface";
+    load_config_general(setting_.gen);
     setting_.control.conf_name = "debug_port";
     load_config_serial(setting_.control);
     setting_.stream.conf_name = "stream_port";
@@ -135,11 +137,6 @@ void config::load_config_all()
     load_battcharg_cfg(setting_.batt, def);
     setting_.battdef.conf_name = "batt_charg_def";
     load_battcharg_cfg(setting_.battdef, def);
-    setting_.display = load_key_value("display", "ascii").toString();
-    setting_.protocol = load_key_value("protocol", "raw").toString();
-    setting_.palette = load_key_value("palette", "dark").toString();
-    setting_.filePathImport = load_key_value("file_import", QDir::homePath()).toString();
-    setting_.filePathExport = load_key_value("file_export", QDir::homePath()).toString();
 }
 
 void config::save_config_all(app::appsetting setting)
@@ -149,11 +146,31 @@ void config::save_config_all(app::appsetting setting)
     save_config_serial(setting_.stream);
     save_config_serial(setting_.program);
     save_battcharg_cfg(setting_.batt);
-    set_key_value("display", setting.display);
-    set_key_value("protocol", setting.protocol);
-    set_key_value("palette", setting.palette);
-    set_key_value("file_import", setting.filePathImport);
-    set_key_value("file_export", setting.filePathExport);
+    save_config_general(setting_.gen);
+}
+
+void config::load_config_general(general &gen)
+{
+    handle_->beginGroup(gen.conf_name);
+    gen.display = load_key_value("display", "ascii").toString();
+    gen.protocol = load_key_value("protocol", "raw").toString();
+    gen.palette = load_key_value("palette", "dark").toString();
+    gen.filePathImport = load_key_value("file_import", QDir::homePath()).toString();
+    gen.filePathExport = load_key_value("file_export", QDir::homePath()).toString();
+    gen.model = load_key_value("model", "unknown").toString();
+    handle_->endGroup();
+}
+
+void config::save_config_general(const general &gen)
+{
+    handle_->beginGroup(gen.conf_name);
+    set_key_value("display",        gen.display);
+    set_key_value("protocol",       gen.protocol);
+    set_key_value("palette",        gen.palette);
+    set_key_value("file_import",    gen.filePathImport);
+    set_key_value("file_export",    gen.filePathExport);
+    set_key_value("model",          gen.model);
+    handle_->endGroup();
 }
 
 QVariant config::load_key_value(const QString &key, QVariant def)

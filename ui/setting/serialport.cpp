@@ -172,17 +172,17 @@ void SerialPort::loadAllUiSetup()
         qDebug() << "list app not handle";
     }
 
-    if(setting.display == "ascii") {
+    if(setting.gen.display == "ascii") {
         rbtnAscii->setChecked(true);
-    } else if(setting.display == "hex") {
+    } else if(setting.gen.display == "hex") {
         rbtnHex->setChecked(true);
     } else {
         qDebug() << "set display failed";
     }
 
-    if(setting.protocol == "raw") {
+    if(setting.gen.protocol == "raw") {
         rbtnRaw->setChecked(true);
-    } else  if(setting.protocol == "isc") {
+    } else  if(setting.gen.protocol == "isc") {
         rbtnProto->setChecked(true);
     } else {
         qDebug() << "set protocol failed";
@@ -339,17 +339,17 @@ void SerialPort::setSerialPort()
     }
 
     if(rbtnAscii->isChecked()) {
-        setting.display == "ascii";
+        setting.gen.display == "ascii";
     } else if(rbtnHex->isChecked()) {
-        setting.display == "hex";
+        setting.gen.display == "hex";
     } else {
         qDebug() << "failed set display\n";
     }
 
     if(rbtnRaw->isChecked()) {
-        setting.protocol = "raw";
+        setting.gen.protocol = "raw";
     } else if(rbtnProto->isChecked()) {
-        setting.protocol = "isc";
+        setting.gen.protocol = "isc";
     } else {
         qDebug() << "failed set protocol\n";
     }

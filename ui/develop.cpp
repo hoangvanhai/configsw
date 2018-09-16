@@ -243,7 +243,7 @@ void Develop::onBtnOpenConnection()
         });
 
         ibc_obj_->set_ack(false);
-        bool proto = setting.protocol == "isc" ? true : false;
+        bool proto = setting.gen.protocol == "isc" ? true : false;
         ibc_obj_->set_protocol(proto);
 
 
