@@ -178,7 +178,8 @@ HEADERS  += ui/mainwindow.h \
     ui/setting/hardware.h \
     ui/setting/permission.h \
     ui/chargeditor.h \
-    cpp_lib/csv/csvfile.h
+    cpp_lib/csv/csvfile.h \
+    ui/definition.h
 
 RESOURCES += resource.qrc
 

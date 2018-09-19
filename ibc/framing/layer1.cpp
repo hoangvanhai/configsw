@@ -152,15 +152,15 @@ std::size_t layer1::sent_raw_data(const void *data, std::size_t len)
         return -3;
     }
 
-    uint8_t *sendData = (uint8_t*)data;
+//    uint8_t *sendData = (uint8_t*)data;
 
-    for(int i = 0; i < len; i++) {
-        printf("%c", sendData[i]);
-    }
+//    for(int i = 0; i < len; i++) {
+//        printf("%c", sendData[i]);
+//    }
 
-    printf("\r\n");
+//    printf("\r\n");
 
-    fflush(stdout);
+//    fflush(stdout);
 
     return sock->writeData(data, len);
 }

@@ -28,19 +28,10 @@ void ChargEditor::createElement()
     iSeries = new QLineSeries;
     vSeries = new QLineSeries;
     chartView = new QChartView(chart, this);
+    axisYCurr = new QValueAxis;
+    axisYVolt = new QValueAxis;
+    axisX = new QValueAxis;
 
-    chart->addSeries(iSeries);
-    chart->addSeries(vSeries);
-    chart->createDefaultAxes();
-    chart->axisX()->setRange(0, 10);
-    chart->axisY()->setRange(0, 20);
-    chart->setTitle("GRAPH");
-    chart->setAnimationOptions(QChart::SeriesAnimations);
-    chartView->setRenderHint(QPainter::Antialiasing, true);
-    chartView->chart()->setTheme(QChart::ChartThemeBlueCerulean);
-    iSeries->setName("current");
-    vSeries->setName("voltage");
-    iSeries->setColor(QColor("red"));
     layoutEditor = new QVBoxLayout;
 
     hSplitter = new QSplitter(Qt::Horizontal);
@@ -61,8 +52,7 @@ void ChargEditor::createElement()
     btnBrowFileExport->setIcon(QIcon(":/icon/open-folder.png"));
 
     btnWrite = new QToolButton;
-    btnRead = new QToolButton;
-    //btnWrite->setIcon(QIcon(":/icon/download.png"));
+    btnRead = new QToolButton;    
     btnWrite->setText("WRITE DATA");
     btnRead->setText(" READ INFO ");
 
@@ -125,8 +115,8 @@ void ChargEditor::createLayout()
     heights.push_back(600);
     vSplitter->setSizes(heights);
     QList<int> widths;
-    widths.push_back(600);
-    widths.push_back(370);
+    widths.push_back(550);
+    widths.push_back(550);
     hSplitter->setSizes(widths);
     setCentralWidget(hSplitter);
 
@@ -184,6 +174,49 @@ void ChargEditor::createLayout()
     btnRead->setToolTip(tr("read device info, fill data to DEVICE MODEL and "
                            "SERIAL"));
 
+    {
+        chart->addSeries(iSeries);
+        chart->addSeries(vSeries);
+
+        chart->addAxis(axisX, Qt::AlignBottom);
+        chart->addAxis(axisYVolt, Qt::AlignRight);
+        chart->addAxis(axisYCurr, Qt::AlignLeft);
+
+        axisX->setRange(0, 10);
+        axisYCurr->setRange(0, 100);
+        axisYVolt->setRange(0, 20);
+
+        iSeries->attachAxis(axisX);
+        iSeries->attachAxis(axisYCurr);
+
+        vSeries->attachAxis(axisX);
+        vSeries->attachAxis(axisYVolt);
+
+        axisX->setTitleText("Time");
+        axisYCurr->setTitleText("Ampe");
+        axisYVolt->setTitleText("Voltage");
+
+        //chart->setTitle("GRAPH");
+
+        chart->setAnimationOptions(QChart::NoAnimation);
+
+        chartView->setRenderHint(QPainter::Antialiasing, true);
+        chartView->chart()->setTheme(QChart::ChartThemeBlueCerulean);
+
+        iSeries->setName("Battery charge current (A)");
+        vSeries->setName("Battery charge voltage (V)");
+        iSeries->setColor(QColor("red"));
+
+
+        vSeries->setPointLabelsVisible(true);
+        vSeries->setPointLabelsFormat("@yPoint");
+
+        iSeries->setPointLabelsVisible(true);
+        iSeries->setPointLabelsFormat("@yPoint");
+
+        axisYCurr->setLinePenColor(iSeries->pen().color());
+        axisYVolt->setLinePenColor(vSeries->pen().color());
+    }
 
     onEnablePanel(false);
 }
@@ -208,7 +241,10 @@ void ChargEditor::createConnection()
     connect(btnConnect, SIGNAL(clicked(bool)), this, SLOT(onBtnOpenConnection()));
     connect(btnDisconnect, SIGNAL(clicked(bool)), this, SLOT(onBtnCloseConnection()));
     connect(this, SIGNAL(signalConnectionEvent(int)), this, SLOT(recvConnectionEvent(int)));
-    connect(this, SIGNAL(signalChargerData(QString)), this, SLOT(recvChargerDataEvent(QString)));
+    //connect(this, SIGNAL(signalChargerData(QString)), this, SLOT(recvChargerDataEvent(QString)));
+    connect(this, SIGNAL(chargerRawData(const uint8_t*,int)), this, SLOT(recvRawData(const uint8_t*,int)));
+    connect(btnRead, SIGNAL(clicked(bool)), this, SLOT(onBtnRead()));
+    connect(btnWrite, SIGNAL(clicked(bool)), this, SLOT(onBtnWrite()));
 }
 
 bool ChargEditor::loadExportData(const QString &file)
@@ -220,9 +256,9 @@ bool ChargEditor::loadExportData(const QString &file)
             NodeInfo node;
             node.id = var->getId();
             node.type = var->getType();
-            node.current = var->getCurrent();
-            node.voltage = var->getVoltage();
-            node.time = var->getTime();
+            node.param1 = var->getParam1();
+            node.param2 = var->getParam2();
+            node.param3 = var->getParam3();
             listData.push_back(node);
             printNodeInfo(node);
         }
@@ -246,9 +282,9 @@ bool ChargEditor::loadExportData(const QString &file)
                 row.clear();
                 row.push_back(QString::number(var.id).toStdString());
                 row.push_back(QString::number(var.type).toStdString());
-                row.push_back(QString::number(var.current).toStdString());
-                row.push_back(QString::number(var.voltage).toStdString());
-                row.push_back(QString::number(var.time).toStdString());
+                row.push_back(QString::number(var.param1).toStdString());
+                row.push_back(QString::number(var.param2).toStdString());
+                row.push_back(QString::number(var.param3).toStdString());
                 if(i == 0) {
                     row.push_back(editImportModel->text().toStdString());
                 }
@@ -271,11 +307,11 @@ void ChargEditor::updateChart()
         listData.clear();
         for(auto var : listEditor) {
             NodeInfo node;
-            node.id = var->getId();
-            node.type = var->getType();
-            node.current = var->getCurrent();
-            node.voltage = var->getVoltage();
-            node.time = var->getTime();
+            node.id     = var->getId();
+            node.type   = var->getType();
+            node.param1 = var->getParam1();
+            node.param2 = var->getParam2();
+            node.param3 = var->getParam3();
             listData.push_back(node);
         }
         drawChart();
@@ -287,7 +323,7 @@ void ChargEditor::setCommunication(std::shared_ptr<ibc::layer2> conn)
     ibc_obj_ = conn;
 }
 
-void ChargEditor::sendData(const std::string &cmd)
+void ChargEditor::sendRawData(const std::string &cmd)
 {
     if(ibc_obj_->get_status() == communication::Status_Connected) {
         int err = ibc_obj_->send_raw_data(cmd.data(), cmd.length());
@@ -300,30 +336,160 @@ void ChargEditor::sendData(const std::string &cmd)
     }
 }
 
-void ChargEditor::drawChart()
+void ChargEditor::sendProtoData(uint8_t subcmd, const uint8_t *data, int len, bool ack)
 {
-    static int count = 0;
+    if(ibc_obj_->get_status() == communication::Status_Connected) {
+        uint8_t *sendData = new uint8_t[len + 2];
+        sendData[0] = subcmd;
+        sendData[1] = len;
+        if(len > 0 && data != NULL) {
+            memcpy(&sendData[2], data, len);
+        }
+        int err = ibc_obj_->send(BC_PC_ID, BC_BOARD_ID,
+                                 ack == false ? FRM_DATA : FRM_DATA | ACK_REQ,
+                                 sendData, len + 2);
+        (void)err;
+        //std::cout << "control send data: " << data << " len " << err;
+        fflush(stdout);
+    } else {
+        QMessageBox::warning(this, "Connection error",
+                             "Connection not open, open and try again !");
+    }
+}
+
+
+double ChargEditor::getParam1Max()
+{
+    double max = 0;
+    for(auto &var : listData) {
+        if(var.type == 0) {
+            if(max < var.param1) max = var.param1;
+        }
+    }
+    return max;
+}
+
+double ChargEditor::getParam2Max()
+{
+    double max = 0;
+    for(auto &var : listData) {
+        if(var.type == 0) {
+            if(max < var.param2) max = var.param2;
+        }
+    }
+    return max;
+}
+
+void ChargEditor::sendReadConfig()
+{
+    sendProtoData(BC_CONFIG | BC_GET, NULL, 0, true);
+}
+
+void ChargEditor::sendWriteConfig()
+{
     if(listData.size() > 0) {
-        chart->axisX()->setRange(0, listData.size() + 1);
-        iSeries->clear();
-        vSeries->clear();
-        count = 0;
-        for(auto var : listData) {
-            iSeries->append(count, var.current);
-            vSeries->append(count, var.voltage);
-            count++;
+        int length = BC_MODEL_LENGTH + 1 + (listData.size() * 27); // size of point = 27
+        uint8_t *sendData = new uint8_t[length];
+        memset(sendData, 0, length);
+        // get model
+        std::string model = editImportModel->text().toStdString();
+        if(model.size() > 8) model.resize(8);
+        for(int i = 0; i < model.size(); i++) {
+            sendData[i] = (model.data())[i];
         }
 
+        // get size of data point
+        sendData[8] = (uint8_t)listData.size();
+        uint8_t *dataptr = &sendData[9];
+
+        for(int i = 0; i < listData.size(); i++) {
+            dataptr[i] = listData.at(i).id;
+            dataptr[i + 1] = listData.at(i).type;
+            Convert::doubleToArray(listData.at(i).param1, &dataptr[i + 2]);
+            Convert::doubleToArray(listData.at(i).param1, &dataptr[i + 10]);
+            Convert::doubleToArray(listData.at(i).param1, &dataptr[i + 18]);
+        }
+        sendProtoData(BC_CONFIG | BC_SET, sendData, length, true);
+        delete[] sendData;
+    }
+
+}
+
+
+void ChargEditor::drawChart()
+{
+    static int icount = 0, vcount = 0;
+
+    if(listData.size() > 0) {
+
+        axisX->setRange(0, qreal(listData.size()) + 0.5);
+
+        double maxCurr = getParam1Max();
+        //double maxVolt = getParam2Max();
+
+        axisYCurr->setRange(0, ceil(maxCurr + 5));
+
+
+        iSeries->clear();
+        vSeries->clear();
+
+        icount = 0;
+        vcount = 0;
+
+        for(size_t i = 0; i < listData.size(); i++) {
+            switch(listData.at(i).type) {
+            case 0:
+                vSeries->append(vcount, listData.at(i).param2);
+                vcount++;
+                vSeries->append(vcount, listData.at(i).param3);
+
+                iSeries->append(icount, listData.at(i).param1);
+                icount++;
+                iSeries->append(icount, listData.at(i).param1);
+
+                if((i + 1) < listData.size()) {
+                    if(listData.at(i + 1).type == 0) {
+                        iSeries->append(icount, listData.at(i + 1).param1);
+                    } else if(listData.at(i + 1).type == 1){
+                        icount++;
+                        vcount++;
+                        iSeries->append(icount, listData.at(i + 1).param2);
+                    }
+                }
+                break;
+            case 1:
+                vSeries->append(vcount, listData.at(i).param1);
+
+                if((i + 1) < listData.size()) {
+                    if(listData.at(i + 1).type == 2) {
+                        vSeries->append(icount, listData.at(i + 1).param1);
+                    }
+                }
+
+                vcount++;
+                iSeries->append(icount, listData.at(i).param2);
+                icount++;
+                break;
+            case 2:
+                vSeries->append(vcount, listData.at(i).param1);                                
+                vcount++;
+                iSeries->append(icount, (listData.at(i - 1).param2) * 0.8);
+                icount++;
+                break;
+            default:
+                break;
+            }
+        }
     }
 }
 
 void ChargEditor::printNodeInfo(const NodeInfo &node)
 {
-    qDebug() << "id " << node.id <<
-                " type " << node.type <<
-                " current " << node.current <<
-                " voltage " << node.voltage <<
-                " time " << node.time;
+    qDebug() << "id "       << node.id <<
+                " type "    << node.type <<
+                " param1 "  << node.param1 <<
+                " param2 "  << node.param2 <<
+                " time "    << node.param3;
 }
 
 bool ChargEditor::loadImportData(const QString &file)
@@ -351,9 +517,9 @@ bool ChargEditor::loadImportData(const QString &file)
                     if(numLine == 0) {
                         LineEditor *line = new LineEditor(layoutEditor->count(), this);
                         line->setType(str::Util::convert<int>(row.at(1), 0));
-                        line->setCurrent(str::Util::convert<double>(row.at(2), 0));
-                        line->setVoltage(str::Util::convert<double>(row.at(3), 0));
-                        line->setTime(str::Util::convert<double>(row.at(4), 0));
+                        line->setParam1(str::Util::convert<double>(row.at(2), 0));
+                        line->setParam2(str::Util::convert<double>(row.at(3), 0));
+                        line->setParam3(str::Util::convert<double>(row.at(4), 0));
                         if(row.size() >= 6)
                             editImportModel->setText(QString(row.at(5).c_str()));
                         layoutEditor->addWidget(line);
@@ -363,9 +529,9 @@ bool ChargEditor::loadImportData(const QString &file)
                     } else if (numLine <= 20) {
                         LineEditor *line = new LineEditor(numLine - 1, this);
                         line->setType(str::Util::convert<int>(row.at(1), 0));
-                        line->setCurrent(str::Util::convert<double>(row.at(2), 0));
-                        line->setVoltage(str::Util::convert<double>(row.at(3), 0));
-                        line->setTime(str::Util::convert<double>(row.at(4), 0));
+                        line->setParam1(str::Util::convert<double>(row.at(2), 0));
+                        line->setParam2(str::Util::convert<double>(row.at(3), 0));
+                        line->setParam3(str::Util::convert<double>(row.at(4), 0));
                         //qDebug() << "insert count = " << numLine;
                         layoutEditor->insertWidget(numLine - 1, line);
                         listEditor.insert(listEditor.size(), line);
@@ -544,7 +710,7 @@ void ChargEditor::onBtnOpenConnection()
             emit signalConnectionEvent(status);
         });
 
-        ibc_obj_->set_ack(false);
+        ibc_obj_->set_ack(true);
         bool proto = setting.gen.protocol == "isc" ? true : false;
         ibc_obj_->set_protocol(proto);
 
@@ -554,9 +720,7 @@ void ChargEditor::onBtnOpenConnection()
             ibc_obj_->set_callback_frame_recv([&](uint8_t *frame_,
                                                 int frame_len_) {
                 (void)frame_len_;
-                //std::cout << "recv control protocol: " << frame_len_ << std::endl;
-                QString msg = QString((const QChar*)(frame_ + IDX_FRM_DATA0), frame_[IDX_FRM_DLEN]);
-                emit signalChargerData(msg);
+                emit chargerRawData((const uint8_t*)(frame_ + IDX_FRM_DATA0), frame_[IDX_FRM_DLEN]);
             });
         } else {
             std::cout << "set control raw\n";
@@ -626,7 +790,14 @@ void ChargEditor::recvConnectionEvent(int event)
 
 void ChargEditor::recvChargerDataEvent(const QString &str)
 {
+    std::string raw = str.toStdString();
 
+
+
+}
+
+void ChargEditor::recvRawData(const uint8_t *data, int len)
+{
 
 }
 
@@ -641,6 +812,26 @@ void ChargEditor::onEnablePanel(bool en)
         btnConnect->setFocus();
 }
 
+void ChargEditor::onBtnRead()
+{
+    sendReadConfig();
+}
+
+void ChargEditor::onBtnWrite()
+{
+    if(listEditor.size() > 0) {
+        if(editImportModel->text() == editDevModel->text()) {
+            sendWriteConfig();
+        } else {
+            QMessageBox::warning(this, "Warning",
+                             "Device model not match !");
+        }
+    } else {
+        QMessageBox::warning(this, "Warning",
+                         "Write failed, no data !");
+    }
+}
+
 
 void ChargEditor::onBtnCloseConnection()
 {
@@ -652,46 +843,169 @@ void ChargEditor::onBtnCloseConnection()
 LineEditor::LineEditor(int id, QWidget *parent) :
     QWidget(parent), id_(id)
 {    
+    createElement();
+    setId(id);
+    setType(0);
+    setParam1(0);
+    setParam2(0);
+    setParam3(0);
+}
+
+LineEditor::LineEditor(int id, int type, double param1,
+                       double param2, double param3, QWidget *parent) :
+    QWidget(parent), id_(id)
+{
+    createElement();
+    setId(id);
+    setType(type);
+    setParam1(param1);
+    setParam2(param2);
+    setParam3(param3);
+}
+
+void LineEditor::createElement()
+{
     QHBoxLayout *hLayout = new QHBoxLayout(this);
     {
-        spCurrent = new QDoubleSpinBox(this);
-        spVoltage = new QDoubleSpinBox(this);
-        spTimeMax = new QDoubleSpinBox(this);
+        spParam1 = new QDoubleSpinBox(this);
+        spParam2 = new QDoubleSpinBox(this);
+        spParam3 = new QDoubleSpinBox(this);
         comType = new QComboBox(this);
+        rowId = new QSpinBox(this);
+
+        lbParam1 = new QLabel(this);
+        lbParam2 = new QLabel(this);
+        lbParam3 = new QLabel(this);
+
         comType->addItem("Fi(u)");
-        comType->addItem("Fu(t)");
-        comType->addItem("Fi(t)");
+        comType->addItem("Fu(t|i)");
+        comType->addItem("U(float)");
         comType->addItem("idle");
-        QSpinBox *rowId = new QSpinBox;
         rowId->setReadOnly(true);
+        rowId->setAlignment(Qt::AlignCenter);
         rowId->setButtonSymbols(QAbstractSpinBox::NoButtons);
-        rowId->setValue(id);
+        //hLayout->addWidget(new QLabel(tr("Id:")));
         hLayout->addWidget(rowId);
         hLayout->addWidget(new QLabel(tr("Type:")));
         hLayout->addWidget(comType);
-        hLayout->addWidget(new QLabel(tr("I:")));
-        hLayout->addWidget(spCurrent);
-        hLayout->addWidget(new QLabel(tr("U:")));
-        hLayout->addWidget(spVoltage);
-        hLayout->addWidget(new QLabel(tr("Time:")));
-        hLayout->addWidget(spTimeMax);
+        hLayout->addWidget(lbParam1);
+        hLayout->addWidget(spParam1);
+        hLayout->addWidget(lbParam2);
+        hLayout->addWidget(spParam2);
+        hLayout->addWidget(lbParam3);
+        hLayout->addWidget(spParam3);
 
-        setCurrent(0);
-        setVoltage(0);
-        setTime(0);
+        connect(spParam1, SIGNAL(valueChanged(double)), this, SLOT(onChangedValue()));
+        connect(spParam2, SIGNAL(valueChanged(double)), this, SLOT(onChangedValue()));
+        connect(spParam3, SIGNAL(valueChanged(double)), this, SLOT(onChangedValue()));
 
-        connect(spCurrent, SIGNAL(valueChanged(double)), this, SLOT(onChangedValue()));
-        connect(spVoltage, SIGNAL(valueChanged(double)), this, SLOT(onChangedValue()));
-        connect(spTimeMax, SIGNAL(valueChanged(double)), this, SLOT(onChangedValue()));
+        connect(comType, SIGNAL(currentIndexChanged(int)), this, SLOT(updateLayout(int)));
+        connect(comType, SIGNAL(currentIndexChanged(int)), this, SLOT(onChangedValue()));
         hLayout->setMargin(0);
+        rowId->setMaximumWidth(30);
+        spParam1->setAlignment(Qt::AlignRight);
+        spParam2->setAlignment(Qt::AlignRight);
+        spParam3->setAlignment(Qt::AlignRight);
+
+        setInputHidden(true);
+
+        //spParam1->setMaximum(1000);
+        //spParam2->setMaximum(1000);
+        //spParam3->setMaximum(1000);
     }
     hLayout->addStretch(1);
     setLayout(hLayout);
 }
 
+void LineEditor::createContent()
+{
+
+}
+
+void LineEditor::setInputHidden(bool hide)
+{
+    if(hide) {
+        lbParam1->hide();
+        lbParam2->hide();
+        lbParam3->hide();
+        spParam1->hide();
+        spParam2->hide();
+        spParam3->hide();
+    } else {
+        lbParam1->show();
+        lbParam2->show();
+        lbParam3->show();
+        spParam1->show();
+        spParam2->show();
+        spParam3->show();
+    }
+}
+
+void LineEditor::updateLayout(int type)
+{
+    switch(type) {
+    case 0:
+        lbParam1->setText("Iconst:");
+        lbParam2->setText("Umin:");
+        lbParam3->setText("Umax:");
+
+        lbParam1->show();
+        lbParam2->show();
+        lbParam3->show();
+
+        spParam1->setSuffix(" A");
+        spParam2->setSuffix(" V");
+        spParam3->setSuffix(" V");
+
+        spParam1->show();
+        spParam2->show();
+        spParam3->show();
+        break;
+    case 1:
+        lbParam1->setText("Uconst:");
+        lbParam2->setText("Imin:");
+        lbParam3->setText("Tmax:");
+
+        lbParam1->show();
+        lbParam2->show();
+        lbParam3->show();
+
+        spParam1->setSuffix(" V");
+        spParam2->setSuffix(" A");
+        spParam3->setSuffix(" M");
+
+        spParam1->show();
+        spParam2->show();
+        spParam3->show();        
+        break;
+    case 2:
+        lbParam1->setText("Uconst:");
+        spParam1->setSuffix(" V");
+
+        lbParam1->show();
+        spParam1->show();
+
+        lbParam2->hide();
+        spParam2->hide();
+        lbParam3->hide();
+        spParam3->hide();
+
+        break;
+
+    case 3:
+        setInputHidden(true);
+        break;
+
+    default:
+
+        break;
+    }
+}
+
 void LineEditor::setId(int id)
 {
     id_ = id;
+    rowId->setValue(id);
 }
 
 int LineEditor::getId() const
@@ -699,9 +1013,10 @@ int LineEditor::getId() const
     return id_;
 }
 
-void LineEditor::setType(int idx)
+void LineEditor::setType(int type)
 {
-    comType->setCurrentIndex(idx);
+    comType->setCurrentIndex(type);
+    updateLayout(type);
 }
 
 int LineEditor::getType() const
@@ -709,90 +1024,97 @@ int LineEditor::getType() const
     return comType->currentIndex();
 }
 
-void LineEditor::setCurrent(double value)
+void LineEditor::setParam1(double value)
 {
-    QPalette p;
-    spCurrent->setValue(value);
-    if(spCurrent->value() <= 0) {
-        p.setColor(QPalette::Text, QColor("red"));
+//    QPalette p;
+    spParam1->setValue(value);
+//    if(spParam1->value() <= 0) {
+//        p.setColor(QPalette::Text, QColor("red"));
+//    } else {
+//        p.setColor(QPalette::Text, QColor("white"));
+//    }
+//    spParam1->setPalette(p);
+}
+
+double LineEditor::getParam1() const
+{
+    return spParam1->value();
+}
+
+void LineEditor::setParam2(double value)
+{
+//    QPalette p;
+    spParam2->setValue(value);
+//    if(spParam2->value() <= 0) {
+//        p.setColor(QPalette::Text, QColor("red"));
+//    } else {
+//        p.setColor(QPalette::Text, QColor("white"));
+//    }
+//    spParam2->setPalette(p);
+}
+
+double LineEditor::getParam2() const
+{
+    return spParam2->value();
+}
+
+void LineEditor::setParam3(double value)
+{
+//    QPalette p;
+    if(comType->currentIndex() == 1) {
+        spParam3->setMaximum(1000);
+        spParam3->setDecimals(1);
     } else {
-        p.setColor(QPalette::Text, QColor("white"));
+        spParam3->setMaximum(100);
+        spParam3->setDecimals(2);
     }
-    spCurrent->setPalette(p);
+    spParam3->setValue(value);
+//    if(spParam3->value() <= 0) {
+//        p.setColor(QPalette::Text, QColor("red"));
+//    } else {
+//        p.setColor(QPalette::Text, QColor("white"));
+//    }
+//    spParam3->setPalette(p);
 }
 
-double LineEditor::getCurrent() const
+double LineEditor::getParam3() const
 {
-    return spCurrent->value();
-}
-
-void LineEditor::setVoltage(double value)
-{
-    QPalette p;
-    spVoltage->setValue(value);
-    if(spVoltage->value() <= 0) {
-        p.setColor(QPalette::Text, QColor("red"));
-    } else {
-        p.setColor(QPalette::Text, QColor("white"));
-    }
-    spVoltage->setPalette(p);
-}
-
-double LineEditor::getVoltage() const
-{
-    return spVoltage->value();
-}
-
-void LineEditor::setTime(double time)
-{
-    QPalette p;
-    spTimeMax->setValue(time);
-    if(spTimeMax->value() <= 0) {
-        p.setColor(QPalette::Text, QColor("red"));
-    } else {
-        p.setColor(QPalette::Text, QColor("white"));
-    }
-    spTimeMax->setPalette(p);
-}
-
-double LineEditor::getTime() const
-{
-    return spTimeMax->value();
+    return spParam3->value();
 }
 
 void LineEditor::onChangedValue()
 {
     emit changedValue();
 
-    QPalette p1, p2, p3;
+//    QPalette p1, p2, p3;
 
-    if(spCurrent->value() <= 1) {
-        p1.setColor(QPalette::Text, QColor("red"));
-    } else {
-        qDebug() << "set white 1 " << spCurrent->value();
-        p1.setColor(QPalette::Text, QColor("white"));
-    }
-    spCurrent->setPalette(p1);
-    spCurrent->update();
+//    if(spParam1->value() <= 1) {
+//        p1.setColor(QPalette::Text, QColor("red"));
+//    } else {
+//        qDebug() << "set white 1 " << spParam1->value();
+//        p1.setColor(QPalette::Text, QColor("white"));
+//    }
+//    spParam1->setPalette(p1);
+//    spParam1->update();
 
-    if(spVoltage->value() <= 1) {
-        p2.setColor(QPalette::Text, QColor("red"));
-    } else {
-        qDebug() << "set white 2 " << spVoltage->value();
-        p2.setColor(QPalette::Text, QColor("white"));
-    }
-    spVoltage->setPalette(p2);
-    spVoltage->update();
+//    if(spParam2->value() <= 1) {
+//        p2.setColor(QPalette::Text, QColor("red"));
+//    } else {
+//        qDebug() << "set white 2 " << spParam2->value();
+//        p2.setColor(QPalette::Text, QColor("white"));
+//    }
+//    spParam2->setPalette(p2);
+//    spParam2->update();
 
-    if(spTimeMax->value() <= 1) {
-        p3.setColor(QPalette::Text, QColor("red"));
-    } else {
-        qDebug() << "set white 3 " << spTimeMax->value();
-        p3.setColor(QPalette::Text, QColor("white"));
-    }
+//    if(spParam3->value() <= 1) {
+//        p3.setColor(QPalette::Text, QColor("red"));
+//    } else {
+//        qDebug() << "set white 3 " << spParam3->value();
+//        p3.setColor(QPalette::Text, QColor("white"));
+//    }
 
-    spTimeMax->setPalette(p3);
-    spTimeMax->update();
+//    spParam3->setPalette(p3);
+//    spParam3->update();
 
 
 }

@@ -21,6 +21,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::initVariable()
 {
+    qDebug() << "size of double " << sizeof(double) << " size of float " << sizeof(float);
     app::config::instance()->open_file("setup.ini");
     app::config::instance()->load_config_all();
     helpWindow = Q_NULLPTR;
